@@ -6,7 +6,7 @@
 #    By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/05 02:44:37 by abel-hid          #+#    #+#              #
-#    Updated: 2023/11/10 21:12:14 by abel-hid         ###   ########.fr        #
+#    Updated: 2023/11/11 06:33:30 by abel-hid         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,7 @@ NAME = cub3D
 SRCS =	main.c\
 		get_next_line.c\
 		get_next_line_utils.c\
+		split.c\
 
 OBJS = $(SRCS:.c=.o)
 

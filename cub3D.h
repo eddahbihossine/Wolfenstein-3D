@@ -6,7 +6,7 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/11/11 03:52:24 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/11/11 06:36:20 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,8 @@ typedef struct	s_map
     char     *so;
     char     *we;
     char     *ea;
-    t_color  f;
-    t_color  c;
+    t_color  floor;
+    t_color  ceiling;
     
 }				t_map;
 
@@ -76,8 +76,8 @@ char	*ft_get_line(char **str, char **line, int new_line);
 char	*get_rest(char **str, int new_line);
 int		ft_check_new_line(char *str);
 int	ft_atoi(const char *str);
-
-
+char	**ft_split(char const *s, char c);
+void	ft_free(char **s);
 
 
 

@@ -34,40 +34,63 @@ char  *skip_space(char *line)
     return (&line[i]);
 }
 
-int init_color(t_map *map, char *line)
+int init_floor(t_map *map, char *line) 
 {
-    int i = 0;
-    int j = 0;
-    int k = 0;
     char *tmp;
+    char **split;
 
     tmp = skip_space(ft_substr(line, 1, ft_strlen(line)));
-    while (tmp[i])
-    {
-        if (tmp[i] == ',')
-        {
-            j++;
-            k = 0;
-        }
-        else if (j == 0)
-            map->f.r = ft_atoi(tmp);
-        else if (j == 1)
-            map->f.g = ft_atoi(tmp);
-        else if (j == 2)
-            map->f.b = ft_atoi(tmp);
-        i++;
-    }
-    return (0);
+    split = ft_split(tmp, ',');
+    map->floor.r = ft_atoi(split[0]);
+    map->floor.g = ft_atoi(split[1]);
+    map->floor.b = ft_atoi(split[2]);
+    ft_free(split);
+    return 0;
 }
 
+int init_ceiling(t_map *map, char *line)
+{
+    char *tmp;
+    char **split;
 
-int init_all(t_map *map , int fd)
+    tmp = skip_space(ft_substr(line, 1, ft_strlen(line)));
+    split = ft_split(tmp, ',');
+    map->ceiling.r = ft_atoi(split[0]);
+    map->ceiling.g = ft_atoi(split[1]);
+    map->ceiling.b = ft_atoi(split[2]);
+    ft_free(split);
+    return 0;
+}
+
+int  count_lines(char *str)
+{
+    int count = 0;
+    char *line;
+    int fd = open(str, O_RDONLY);
+
+    while((line = get_next_line(fd)))
+    {
+        count++;
+    }
+    return (count);
+}
+void init_map(t_map *map, int size)
+{
+    int i = 0;
+    map->map = malloc(sizeof(char *) * (size + 1));
+    while (i < size)
+    {
+        map->map[i] = NULL;
+        i++;
+    }
+}
+int init_all(t_map *map , int fd, char *str)
 {
     char *line;
     int i = 0;
     int count = 0;
-
-    map->map = malloc(sizeof(char *) * 100);
+    int j = count_lines(str);
+    init_map(map, j);
 
     while((line = get_next_line(fd)))
     {
@@ -82,9 +105,9 @@ int init_all(t_map *map , int fd)
             else if(line[0]== 'E' && line[1] == 'A')
                 map->ea = skip_space(ft_substr(line, 2, ft_strlen(line)));
             else if(line[0]== 'C')
-                init_color(map, line);
+                init_ceiling(map, line);
             else if(line[0]== 'F')
-                init_color(map, line);
+                init_floor(map, line);
         }
         else
         {
@@ -117,13 +140,19 @@ int main(int ac, char **av)
         return 1;
     }
 
-    if(init_all(&map, fd))
+    if(init_all(&map, fd, av[1]))
         return (0);
-    
+   
     printf("%s", map.no);
     printf("%s", map.so);
     printf("%s", map.we);
     printf("%s", map.ea);
+    printf("%d\n", map.floor.r);
+    printf("%d\n", map.floor.g);
+    printf("%d\n", map.floor.b);
+    printf("%d\n", map.ceiling.r);
+    printf("%d\n", map.ceiling.g);
+    printf("%d\n", map.ceiling.b);
 
     int i = 0;
     while (map.map[i] != NULL)
@@ -131,6 +160,9 @@ int main(int ac, char **av)
         printf("%s", map.map[i]);
         i++;
     }
+
+    
+
     
 
     return 0;
