@@ -20,12 +20,14 @@ int check_file(char *file)
     }
     return (0);
 }
+
 int is_space(char c)
 {
     if (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f')
         return (1);
     return (0);
 }
+
 char  *skip_space(char *line)
 {
     int i = 0;
@@ -89,6 +91,7 @@ int init_all(t_map *map , int fd, char *str)
     char *line;
     int i = 0;
     int count = 0;
+    int k = 0;
     int j = count_lines(str);
     init_map(map, j);
 
@@ -97,17 +100,35 @@ int init_all(t_map *map , int fd, char *str)
         if(count <= 6)
         {
             if(line[0]== 'N' && line[1] == 'O')
+            {
                 map->no = skip_space(ft_substr(line, 2, ft_strlen(line)));
+                k++;
+            }
             else if(line[0]== 'S' && line[1] == 'O')
+            {
                 map->so = skip_space(ft_substr(line, 2, ft_strlen(line)));
+                k++;
+            }
             else if(line[0]== 'W' && line[1] == 'E')
+            {
                 map->we = skip_space(ft_substr(line, 2, ft_strlen(line)));
+                k++;
+            }
             else if(line[0]== 'E' && line[1] == 'A')
+            {
                 map->ea = skip_space(ft_substr(line, 2, ft_strlen(line)));
+                k++;
+            }
             else if(line[0]== 'C')
+            {
                 init_ceiling(map, line);
+                k++;
+            }
             else if(line[0]== 'F')
+            {
                 init_floor(map, line);
+                k++;
+            }
         }
         else
         {
@@ -116,8 +137,47 @@ int init_all(t_map *map , int fd, char *str)
         }
         count++;
     }
+    if(k != 6)
+        return (1);
     return (0);
 }
+
+void   ft_free_map(t_map *map)
+{
+    int i = 0;
+    while (map->map[i] != NULL)
+    {
+        free(map->map[i]);
+        i++;
+    }
+    free(map->map);
+}
+void f()
+{
+    system("leaks cub3D");
+}
+
+int check_player_position(t_map *map)
+{
+    int i = 0;
+    int j = 0;
+    int count = 0;
+    while (map->map[i] != NULL)
+    {
+        j = 0;
+        while (map->map[i][j] != '\0')
+        {
+            if (map->map[i][j] == 'N' || map->map[i][j] == 'S' || map->map[i][j] == 'W' || map->map[i][j] == 'E')
+                count++;
+            j++;
+        }
+        i++;
+    }
+    if (count != 1)
+        return (1);
+    return (0);
+}
+
 
 
 
@@ -140,8 +200,11 @@ int main(int ac, char **av)
         return 1;
     }
 
-    if(init_all(&map, fd, av[1]))
-        return (0);
+    if(init_all(&map, fd, av[1]) || check_player_position(&map))
+    {
+        printf("Error\n");
+        return (1);
+    }
    
     printf("%s", map.no);
     printf("%s", map.so);
@@ -160,10 +223,6 @@ int main(int ac, char **av)
         printf("%s", map.map[i]);
         i++;
     }
-
-    
-
-    
 
     return 0;
 }

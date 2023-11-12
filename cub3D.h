@@ -6,7 +6,7 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/11/11 06:36:20 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/11/11 08:14:09 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,19 +54,23 @@ typedef struct	s_map
     char     *we;
     char     *ea;
     t_color  floor;
-    t_color  ceiling;
-    
+    t_color  ceiling; 
 }				t_map;
 
 typedef struct	s_data
 {
     void	*mlx_ptr;
     void	*mlx_win;
+    void	*img;
+    char	*addr;
+    int    width;
+    int    height;
+    t_map  map;
+    
     
 }				t_data;
 
 //get next line functions
-
 char	*get_next_line(int fd);
 char	*ft_strjoin(char const *s1, char const *s2);
 size_t	ft_strlen(const char *s);
