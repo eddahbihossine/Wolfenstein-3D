@@ -6,7 +6,7 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/11/11 08:14:09 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/11/13 06:18:54 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,11 +66,9 @@ typedef struct	s_data
     int    width;
     int    height;
     t_map  map;
-    
-    
+  
 }				t_data;
 
-//get next line functions
 char	*get_next_line(int fd);
 char	*ft_strjoin(char const *s1, char const *s2);
 size_t	ft_strlen(const char *s);
@@ -82,8 +80,17 @@ int		ft_check_new_line(char *str);
 int	ft_atoi(const char *str);
 char	**ft_split(char const *s, char c);
 void	ft_free(char **s);
-
+int size_line(char *line);
 
 
 
 #endif
+
+
+
+// 111111
+// 100101
+// 101001 map[i-1][j]
+// 1101N1 map[i][j - 1] | map[i][j + 1]
+// 11 1111 map[i+1][j]
+// 1111111

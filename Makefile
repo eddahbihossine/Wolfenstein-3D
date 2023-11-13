@@ -6,7 +6,7 @@
 #    By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/05 02:44:37 by abel-hid          #+#    #+#              #
-#    Updated: 2023/11/11 06:33:30 by abel-hid         ###   ########.fr        #
+#    Updated: 2023/11/13 06:09:22 by abel-hid         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ CFLAGS = -Wall -Werror -Wextra
 all: $(NAME)
 
 $(NAME):$(OBJS)
-	$(CC) $(OBJS) -lmlx -framework OpenGL -framework AppKit -o $(NAME)
+	$(CC) $(OBJS) -lmlx -framework OpenGL -framework AppKit -o $(NAME) 
 %.o: %.c
 	$(CC) $(CFLAGS) -Imlx -c $< -o $@
 

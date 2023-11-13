@@ -86,6 +86,67 @@ void init_map(t_map *map, int size)
         i++;
     }
 }
+int get_width(char *line) 
+{
+    int i = 0;
+    int count = 0;
+    while (line[i] != '\0') 
+    {
+        if (line[i] == '1')
+            count++;
+        i++;
+    }
+    return count;
+}
+
+int get_height(t_map *map) 
+{
+    int i = 0;
+    int count = 0;
+    while (map->map[i] != NULL) 
+    {
+        count++;
+        i++;
+    }
+    return count;
+}
+
+int size_line(char *line)
+{
+    int i = 0;
+    while (line[i] != '\0' && line[i] != '\n')
+        i++;
+    return (i);
+}
+
+char *my_strdup(char *line)
+{
+    int i = 0;
+    char *str = malloc(sizeof(char) * (size_line(line) + 1));
+    while (line[i] != '\0' && line[i] != '\n')
+    {
+        str[i] = line[i];
+        i++;
+    }
+    str[i] = '\0';
+    return (str);
+}
+
+int is_empty(char *line)
+{
+    int i = 0;
+    size_t count = 0;
+    while(line[i] != '\0')
+    {
+        if(is_space(line[i]) == 1)
+            count++;
+        i++;
+    }
+    if(count == ft_strlen(line))
+        return (1);
+    return (0);
+
+}
 int init_all(t_map *map , int fd, char *str)
 {
     char *line;
@@ -97,26 +158,29 @@ int init_all(t_map *map , int fd, char *str)
 
     while((line = get_next_line(fd)))
     {
+        if(is_empty(line) == 1 && map->map[0] == NULL)
+            continue;
         if(count <= 6)
         {
             if(line[0]== 'N' && line[1] == 'O')
             {
-                map->no = skip_space(ft_substr(line, 2, ft_strlen(line)));
+                char *str = ft_substr(line, 2, size_line(line) -2);
+                map->no = skip_space(str);
                 k++;
             }
             else if(line[0]== 'S' && line[1] == 'O')
             {
-                map->so = skip_space(ft_substr(line, 2, ft_strlen(line)));
+                map->so = skip_space(ft_substr(line, 2, size_line(line) -2));
                 k++;
             }
             else if(line[0]== 'W' && line[1] == 'E')
             {
-                map->we = skip_space(ft_substr(line, 2, ft_strlen(line)));
+                map->we = skip_space(ft_substr(line, 2, size_line(line)- 2));
                 k++;
             }
             else if(line[0]== 'E' && line[1] == 'A')
             {
-                map->ea = skip_space(ft_substr(line, 2, ft_strlen(line)));
+                map->ea = skip_space(ft_substr(line, 2, size_line(line) -2));
                 k++;
             }
             else if(line[0]== 'C')
@@ -132,15 +196,18 @@ int init_all(t_map *map , int fd, char *str)
         }
         else
         {
-            map->map[i] = ft_strdup(line);
+            map->map[i] = my_strdup(line);
             i++;
         }
+        
         count++;
     }
+
     if(k != 6)
         return (1);
     return (0);
 }
+
 
 void   ft_free_map(t_map *map)
 {
@@ -180,6 +247,147 @@ int check_player_position(t_map *map)
 
 
 
+int check_valid_map(t_map *map)
+{
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    int min = 0;
+    min = map->map_width;
+    while (map->map[i] != NULL)
+    {
+        j = 0;
+        if(strcmp(map->map[i], "\0") == 0)
+            return (1);
+        while (map->map[i][j] != '\0')
+        {
+            if (map->map[i][j] != '1' && map->map[i][j] != '0' && map->map[i][j] != '2' && map->map[i][j] != 'N' && map->map[i][j] != 'S' && map->map[i][j] != 'W' && map->map[i][j] != 'E' && map->map[i][j] != ' ')
+                return (1);
+            j++;
+        }
+        i++;
+    }
+    i = 0;
+    while(strcmp(map->map[i], "\0") == 0)
+    {
+        i++;
+        k++;
+    }
+    while (map->map[i] != NULL)
+    {
+        j = 0;
+        while (map->map[i][j] != '\0')
+        {
+            j++;
+        }
+        if (j < min)
+            min = j;
+        i++;
+    }
+
+    if(min < 6 || i - k < 5)
+        return (1);
+    return (0);
+}
+int get_longest_line(t_map *map)
+{
+    int i = 0;
+    int j = 0;
+    int max = 0;
+    while (map->map[i] != NULL)
+    {
+        j = 0;
+        while (map->map[i][j] != '\0')
+        {
+            j++;
+        }
+        if (j > max)
+            max = j;
+        i++;
+    }
+    return (max);
+}
+
+
+
+int update_map(t_map *map)
+{
+    map->map_width = get_longest_line(map);
+    map->map_height = get_height(map);
+    int i = 0;
+    int j = 0;
+    char *tmp;
+    tmp = NULL;
+
+    while(i < map->map_height)
+    {
+        j = 0;
+        tmp = malloc(sizeof(char) * (map->map_width + 1));
+        while (j < map->map_width)
+        {
+            if (map->map[i][j])
+                tmp[j] = map->map[i][j];
+            else
+                tmp[j] = '\0';
+            
+            j++;
+        }
+        tmp[j] = '\0';
+        map->map[i] = tmp;
+        i++;
+    }
+    return (0);
+}
+
+int valid_walls(t_map *map)
+{
+    int i = 0;
+    int j = 0;
+
+
+    while (map->map[i] != NULL)
+    {
+        j = 0;
+        while (map->map[i][j] != '\0')
+        {
+            if (map->map[i][j] == '0' && i != 0 && i != map->map_height - 1 && j != 0 && j != map->map_width - 1)
+            {
+                if (map->map[i - 1][j] == ' ' || map->map[i + 1][j] == ' ' || map->map[i][j - 1] == ' ' || map->map[i][j + 1] == ' ')
+                {
+                    return (1);
+                }
+            }
+            j++;
+        }
+        i++;
+    }
+    return (0);
+}
+int valid_position(t_map *map)
+{
+    int i = 0;
+    int j = 0;
+    while (map->map[i] != NULL)
+    {
+        j = 0;
+        while (map->map[i][j] != '\0')
+        {
+            if (map->map[i][j] == 'N' || map->map[i][j] == 'S' || map->map[i][j] == 'W' || map->map[i][j] == 'E')
+            {
+                if (map->map[i - 1][j] == ' ' || map->map[i + 1][j] == ' ' || map->map[i][j - 1] == ' ' || map->map[i][j + 1] == ' ')
+                    return (1);
+                if(map->map[i - 1][j] == '1' && map->map[i + 1][j] == '1' && map->map[i][j - 1] == '1' && map->map[i][j + 1] == '1')
+                    return (1);
+            }
+            j++;
+        }
+        i++;
+    }
+    return (0);
+}
+
+
+
 
 int main(int ac, char **av) 
 {
@@ -205,24 +413,45 @@ int main(int ac, char **av)
         printf("Error\n");
         return (1);
     }
+    update_map(&map);
+    if (check_valid_map(&map))
+    {
+        printf("Error\n");
+        return (1);
+    }
+    if (valid_walls(&map))
+    {
+        printf("Error\n");
+        return (1);
+    }
+    if (valid_position(&map))
+    {
+        printf("Error\n");
+        return (1);
+    }
+  
+
    
-    printf("%s", map.no);
-    printf("%s", map.so);
-    printf("%s", map.we);
-    printf("%s", map.ea);
-    printf("%d\n", map.floor.r);
-    printf("%d\n", map.floor.g);
-    printf("%d\n", map.floor.b);
-    printf("%d\n", map.ceiling.r);
-    printf("%d\n", map.ceiling.g);
-    printf("%d\n", map.ceiling.b);
+    // printf("%s\n", map.no);
+    // printf("%s\n", map.so);
+    // printf("%s\n", map.we);
+    // printf("%s\n", map.ea);
+    // printf("%d\n", map.floor.r);
+    // printf("%d\n", map.floor.g);
+    // printf("%d\n", map.floor.b);
+    // printf("%d\n", map.ceiling.r);
+    // printf("%d\n", map.ceiling.g);
+    // printf("%d\n", map.ceiling.b);
 
     int i = 0;
     while (map.map[i] != NULL)
     {
-        printf("%s", map.map[i]);
+        printf("%s\n", map.map[i]);
         i++;
     }
+    // printf("\n");
+    // printf("h %d\n", map.map_height);
+    // printf("w %d\n", map.map_width);
 
     return 0;
-}
+} 
