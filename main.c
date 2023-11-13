@@ -138,7 +138,7 @@ int is_empty(char *line)
     size_t count = 0;
     while(line[i] != '\0')
     {
-        if(is_space(line[i]) == 1)
+        if(is_space(line[i]))
             count++;
         i++;
     }
@@ -160,6 +160,7 @@ int init_all(t_map *map , int fd, char *str)
     {
         if(is_empty(line) == 1 && map->map[0] == NULL)
             continue;
+
         if(count <= 6)
         {
             if(line[0]== 'N' && line[1] == 'O')
@@ -199,7 +200,7 @@ int init_all(t_map *map , int fd, char *str)
             map->map[i] = my_strdup(line);
             i++;
         }
-        
+        free(line);
         count++;
     }
 
@@ -326,7 +327,12 @@ int update_map(t_map *map)
         while (j < map->map_width)
         {
             if (map->map[i][j])
-                tmp[j] = map->map[i][j];
+            {
+                if(map->map[i][j] != '1' && map->map[i][j] != '0' && map->map[i][j] != 'N' && map->map[i][j] != 'S' && map->map[i][j] != 'W' && map->map[i][j] != 'E')
+                    tmp[j] = ' ';
+                else
+                    tmp[j] = map->map[i][j];
+            }
             else
                 tmp[j] = '\0';
             
@@ -388,6 +394,39 @@ int valid_position(t_map *map)
 
 
 
+char *trimLeadingSpaces(const char *str) {
+    while (*str == ' ' || *str == '\t') {
+        str++;
+    }
+    return strdup(str);
+}
+int wall_check(t_map *map) 
+{
+    int i;
+
+    if (map == NULL || map->map == NULL || map->map[0] == NULL) 
+    {
+        return 1;
+    }
+
+    i = 0;
+
+    while (map->map[i] != NULL) 
+    {
+        map->map[i] = trimLeadingSpaces(map->map[i]);
+        printf("%s\n", map->map[i]);
+        break;
+        if (map->map[i][0] != '1' || map->map[i][map->map_width - 1] != '1') 
+        {
+            return 1;
+        }
+        i++;
+    }
+
+
+    return 0; // Map is closed by walls
+}
+
 
 int main(int ac, char **av) 
 {
@@ -413,23 +452,27 @@ int main(int ac, char **av)
         printf("Error\n");
         return (1);
     }
-    update_map(&map);
-    if (check_valid_map(&map))
-    {
-        printf("Error\n");
-        return (1);
-    }
-    if (valid_walls(&map))
-    {
-        printf("Error\n");
-        return (1);
-    }
-    if (valid_position(&map))
-    {
-        printf("Error\n");
-        return (1);
-    }
-  
+    // update_map(&map);
+    // if (check_valid_map(&map))
+    // {
+    //     printf("Error\n");
+    //     return (1);
+    // }
+    // if (valid_walls(&map))
+    // {
+    //     printf("Error\n");
+    //     return (1);
+    // }
+    // if (valid_position(&map))
+    // {
+    //     printf("Error\n");
+    //     return (1);
+    // }
+    // if (wall_check(&map))
+    // {
+    //     printf("Error\n");
+    //     return (1);
+    // }
 
    
     // printf("%s\n", map.no);
