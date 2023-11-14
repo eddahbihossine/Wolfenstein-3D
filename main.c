@@ -31,22 +31,28 @@ int is_space(char c)
 char  *skip_space(char *line)
 {
     int i = 0;
+    char *ptr;
     while (is_space(line[i]))
         i++;
-    return (&line[i]);
+    ptr = ft_substr(line, i, ft_strlen(line) - i);
+    return (ptr);
 }
 
 int init_floor(t_map *map, char *line) 
 {
     char *tmp;
     char **split;
+    char *ptr;
 
-    tmp = skip_space(ft_substr(line, 1, ft_strlen(line)));
+    ptr = ft_substr(line, 1, ft_strlen(line));
+    tmp = skip_space(ptr);
     split = ft_split(tmp, ',');
     map->floor.r = ft_atoi(split[0]);
     map->floor.g = ft_atoi(split[1]);
     map->floor.b = ft_atoi(split[2]);
     ft_free(split);
+    free(tmp);
+    free(ptr);
     return 0;
 }
 
@@ -54,13 +60,17 @@ int init_ceiling(t_map *map, char *line)
 {
     char *tmp;
     char **split;
+    char *ptr;
 
-    tmp = skip_space(ft_substr(line, 1, ft_strlen(line)));
+    ptr = ft_substr(line, 1, ft_strlen(line));
+    tmp = skip_space(ptr);
     split = ft_split(tmp, ',');
     map->ceiling.r = ft_atoi(split[0]);
     map->ceiling.g = ft_atoi(split[1]);
     map->ceiling.b = ft_atoi(split[2]);
     ft_free(split);
+    free(tmp);
+    free(ptr);
     return 0;
 }
 
@@ -73,7 +83,9 @@ int  count_lines(char *str)
     while((line = get_next_line(fd)))
     {
         count++;
+        free(line);
     }
+    close(fd);
     return (count);
 }
 void init_map(t_map *map, int size)
@@ -142,7 +154,7 @@ int is_empty(char *line)
             count++;
         i++;
     }
-    if(count == ft_strlen(line))
+    if(count == (ft_strlen(line)))
         return (1);
     return (0);
 
@@ -152,6 +164,7 @@ int init_all(t_map *map , int fd, char *str)
     char *line;
     int i = 0;
     int count = 0;
+    char *ptr;
     int k = 0;
     int j = count_lines(str);
     init_map(map, j);
@@ -159,29 +172,39 @@ int init_all(t_map *map , int fd, char *str)
     while((line = get_next_line(fd)))
     {
         if(is_empty(line) == 1 && map->map[0] == NULL)
+        {
+            free(line);
             continue;
+        }
 
-        if(count <= 6)
+        if(count < 6)
         {
             if(line[0]== 'N' && line[1] == 'O')
             {
-                char *str = ft_substr(line, 2, size_line(line) -2);
-                map->no = skip_space(str);
+                ptr = ft_substr(line, 2, size_line(line) -2);
+                map->no = skip_space(ptr);
+                free(ptr);
                 k++;
             }
             else if(line[0]== 'S' && line[1] == 'O')
             {
-                map->so = skip_space(ft_substr(line, 2, size_line(line) -2));
+                ptr = ft_substr(line, 2, size_line(line) -2);
+                map->so = skip_space(ptr);
+                free(ptr);
                 k++;
             }
             else if(line[0]== 'W' && line[1] == 'E')
             {
-                map->we = skip_space(ft_substr(line, 2, size_line(line)- 2));
+                ptr = ft_substr(line, 2, size_line(line) -2);
+                map->we = skip_space(ptr);
+                free(ptr);
                 k++;
             }
             else if(line[0]== 'E' && line[1] == 'A')
             {
-                map->ea = skip_space(ft_substr(line, 2, size_line(line) -2));
+                ptr = ft_substr(line, 2, size_line(line) -2);
+                map->ea = skip_space(ptr);
+                free(ptr);
                 k++;
             }
             else if(line[0]== 'C')
@@ -197,29 +220,48 @@ int init_all(t_map *map , int fd, char *str)
         }
         else
         {
-            map->map[i] = my_strdup(line);
-            i++;
+            if(k == 6)
+            {
+                map->map[i] = my_strdup(line);
+                i++;
+            }
         }
+
         free(line);
         count++;
     }
-
+    map->map[i] = NULL;
+   
+    close(fd);
     if(k != 6)
         return (1);
+    
     return (0);
 }
 
 
-void   ft_free_map(t_map *map)
+void   ft_free_map(t_map **map)
 {
     int i = 0;
-    while (map->map[i] != NULL)
+    if((*map)->no)
+    free((*map)->no);
+    if((*map)->so)
+    free((*map)->so);
+    if((*map)->we)
+    free((*map)->we);
+    if((*map)->ea)
+    free((*map)->ea);
+
+    while ((*map)->map[i] != NULL)
     {
-        free(map->map[i]);
+        free((*map)->map[i]);
         i++;
     }
-    free(map->map);
+    if((*map)->map)
+    free((*map)->map);
+    free(*map);
 }
+
 void f()
 {
     system("leaks cub3D");
@@ -230,12 +272,14 @@ int check_player_position(t_map *map)
     int i = 0;
     int j = 0;
     int count = 0;
-    while (map->map[i] != NULL)
+    t_map *tmp;
+    tmp = map;
+    while (tmp->map[i] != NULL)
     {
         j = 0;
-        while (map->map[i][j] != '\0')
+        while (tmp->map[i][j] != '\0')
         {
-            if (map->map[i][j] == 'N' || map->map[i][j] == 'S' || map->map[i][j] == 'W' || map->map[i][j] == 'E')
+            if (tmp->map[i][j] == 'N' || tmp->map[i][j] == 'S' || tmp->map[i][j] == 'W' || tmp->map[i][j] == 'E')
                 count++;
             j++;
         }
@@ -262,7 +306,7 @@ int check_valid_map(t_map *map)
             return (1);
         while (map->map[i][j] != '\0')
         {
-            if (map->map[i][j] != '1' && map->map[i][j] != '0' && map->map[i][j] != '2' && map->map[i][j] != 'N' && map->map[i][j] != 'S' && map->map[i][j] != 'W' && map->map[i][j] != 'E' && map->map[i][j] != ' ')
+            if (map->map[i][j] != '1' && map->map[i][j] != '0' && map->map[i][j] != 'N' && map->map[i][j] != 'S' && map->map[i][j] != 'W' && map->map[i][j] != 'E' && map->map[i][j] != ' ')
                 return (1);
             j++;
         }
@@ -309,7 +353,25 @@ int get_longest_line(t_map *map)
     return (max);
 }
 
-
+int check_wall(t_map *map)
+{
+    int i = 0;
+    int j = 0;
+    while (map->map[i] != NULL)
+    {
+        j = 0;
+        while (map->map[i][j] != '\0')
+        {
+            if (map->map[i][j] == '2')
+            {
+                    return (1);
+            }
+            j++;
+        }
+        i++;
+    }
+    return (0);
+}
 
 int update_map(t_map *map)
 {
@@ -328,8 +390,8 @@ int update_map(t_map *map)
         {
             if (map->map[i][j])
             {
-                if(map->map[i][j] != '1' && map->map[i][j] != '0' && map->map[i][j] != 'N' && map->map[i][j] != 'S' && map->map[i][j] != 'W' && map->map[i][j] != 'E')
-                    tmp[j] = ' ';
+                if(map->map[i][j] != '1' && map->map[i][j] != '0' && map->map[i][j] != 'N' && map->map[i][j] != 'S' && map->map[i][j] != 'W' && map->map[i][j] != 'E' && map->map[i][j] != ' ')
+                    tmp[j] = '2';
                 else
                     tmp[j] = map->map[i][j];
             }
@@ -339,6 +401,7 @@ int update_map(t_map *map)
             j++;
         }
         tmp[j] = '\0';
+        free(map->map[i]);
         map->map[i] = tmp;
         i++;
     }
@@ -356,6 +419,24 @@ int valid_walls(t_map *map)
         j = 0;
         while (map->map[i][j] != '\0')
         {
+            if (i == 0 || i == map->map_height - 1)
+            {
+                if(i == map->map_height - 1)
+                {
+                    if (map->map[i][j]  == '0')
+                    {
+                        if(map->map[i][j - 1] == '0')
+                        {
+                            return (1);
+                        }
+                    }
+                }
+                if (map->map[i][j]  == '0')
+                {
+                    if(map->map[i][j + 1] == '0')
+                        return (1);
+                }
+            }
             if (map->map[i][j] == '0' && i != 0 && i != map->map_height - 1 && j != 0 && j != map->map_width - 1)
             {
                 if (map->map[i - 1][j] == ' ' || map->map[i + 1][j] == ' ' || map->map[i][j - 1] == ' ' || map->map[i][j + 1] == ' ')
@@ -393,51 +474,84 @@ int valid_position(t_map *map)
 }
 
 
-
-char *trimLeadingSpaces(const char *str) {
-    while (*str == ' ' || *str == '\t') {
-        str++;
-    }
-    return strdup(str);
-}
 int wall_check(t_map *map) 
 {
     int i;
+    char *wall;
 
     if (map == NULL || map->map == NULL || map->map[0] == NULL) 
     {
         return 1;
     }
+        i = 0;
 
-    i = 0;
+        wall = ft_strtrim(map->map[0], " ");
+        while (wall[i] != '\0') 
+        {
+            if (wall[i] != '1') 
+            {
+                free(wall);
+                return 1;
+            }
+            i++;
+        }
+        free(wall);
+        i = 1;
 
     while (map->map[i] != NULL) 
     {
-        map->map[i] = trimLeadingSpaces(map->map[i]);
-        printf("%s\n", map->map[i]);
-        break;
-        if (map->map[i][0] != '1' || map->map[i][map->map_width - 1] != '1') 
+        if(map->map[i + 1] == NULL)
+            break;
+        wall = ft_strtrim(map->map[i], " ");
+        if (wall[0] != '1' || wall[ft_strlen(wall) - 1] != '1') 
         {
+            free(wall);
+            return 1;
+        }
+        free(wall);
+        i++;
+    }
+
+    wall = ft_strtrim(map->map[i], " ");
+    i = 0;
+    while (wall[i] != '\0') 
+    {
+        while(wall[i] == ' ')
+            i++;
+    
+        if (wall[i] != '1') 
+        {
+            free(wall);
             return 1;
         }
         i++;
     }
+    free(wall);
 
+    return 0;
 
-    return 0; // Map is closed by walls
 }
+
 
 
 int main(int ac, char **av) 
 {
     int fd;
-    t_map map;
+    t_map *map;
+    map = NULL;
+    atexit(f);
 
     if (ac != 2 || check_file(av[1]) == 0) 
     {
         printf("Error\n");
         return (1);
     }
+    map = malloc(sizeof(t_map));
+    map->no = NULL;
+    map->so = NULL;
+    map->we = NULL;
+    map->ea = NULL;
+    map->map = NULL;
 
     fd = open(av[1], O_RDONLY);
 
@@ -447,54 +561,64 @@ int main(int ac, char **av)
         return 1;
     }
 
-    if(init_all(&map, fd, av[1]) || check_player_position(&map))
+    if(init_all(map, fd, av[1]) || check_player_position(map))
     {
         printf("Error\n");
+        ft_free_map(&map);
         return (1);
     }
-    // update_map(&map);
-    // if (check_valid_map(&map))
+
+    if(update_map(map) || check_wall(map))
+    {
+        printf("Error\n");
+        ft_free_map(&map);
+        return (1);
+    }
+    // if (check_valid_map(map))
     // {
     //     printf("Error\n");
+    //     ft_free_map(&map);
     //     return (1);
     // }
-    // if (valid_walls(&map))
+    // if (valid_walls(map))
     // {
     //     printf("Error\n");
+    //     ft_free_map(&map);
     //     return (1);
     // }
-    // if (valid_position(&map))
+    // if (valid_position(map))
     // {
     //     printf("Error\n");
+    //     ft_free_map(&map);
     //     return (1);
     // }
-    // if (wall_check(&map))
+    // if (wall_check(map))
     // {
     //     printf("Error\n");
+    //     ft_free_map(&map);
     //     return (1);
     // }
 
    
-    // printf("%s\n", map.no);
-    // printf("%s\n", map.so);
-    // printf("%s\n", map.we);
-    // printf("%s\n", map.ea);
-    // printf("%d\n", map.floor.r);
-    // printf("%d\n", map.floor.g);
-    // printf("%d\n", map.floor.b);
-    // printf("%d\n", map.ceiling.r);
-    // printf("%d\n", map.ceiling.g);
-    // printf("%d\n", map.ceiling.b);
+    printf("%s\n", map->no);
+    printf("%s\n", map->so);
+    printf("%s\n", map->we);
+    printf("%s\n", map->ea);
+    printf("%d\n", map->floor.r);
+    printf("%d\n", map->floor.g);
+    printf("%d\n", map->floor.b);
+    printf("%d\n", map->ceiling.r);
+    printf("%d\n", map->ceiling.g);
+    printf("%d\n", map->ceiling.b);
 
     int i = 0;
-    while (map.map[i] != NULL)
+    while (map->map[i] != NULL)
     {
-        printf("%s\n", map.map[i]);
+        printf("%s\n", map->map[i]);
         i++;
     }
-    // printf("\n");
-    // printf("h %d\n", map.map_height);
-    // printf("w %d\n", map.map_width);
+
+    ft_free_map(&map);
 
     return 0;
 } 

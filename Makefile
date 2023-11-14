@@ -6,7 +6,7 @@
 #    By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/05 02:44:37 by abel-hid          #+#    #+#              #
-#    Updated: 2023/11/13 06:09:22 by abel-hid         ###   ########.fr        #
+#    Updated: 2023/11/14 14:47:37 by abel-hid         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,7 @@ all: $(NAME)
 
 $(NAME):$(OBJS)
 	$(CC) $(OBJS) -lmlx -framework OpenGL -framework AppKit -o $(NAME) 
-%.o: %.c
+%.o: %.c cub3D.h
 	$(CC) $(CFLAGS) -Imlx -c $< -o $@
 
 clean:
