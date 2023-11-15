@@ -6,7 +6,7 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/11/14 14:48:02 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/11/15 16:28:51 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,8 @@
 #endif
 typedef struct	s_player
 {
-    double	x;
-    double	y;
-    double	dir_x;
-    double	dir_y;
-    double	plane_x;
-    double	plane_y;
-    double	move_speed;
-    double	rot_speed;
+    int	x;
+    int	y;
 }				t_player;
 
 typedef struct  s_color
@@ -54,7 +48,8 @@ typedef struct	s_map
     char     *we;
     char     *ea;
     t_color  floor;
-    t_color  ceiling; 
+    t_color  ceiling;
+    t_player player;
 }				t_map;
 
 typedef struct	s_data
@@ -65,6 +60,9 @@ typedef struct	s_data
     char	*addr;
     int    width;
     int    height;
+    int		bits_per_pixel;
+	int		line_length;
+	int		endian;
     t_map  map;
   
 }				t_data;
