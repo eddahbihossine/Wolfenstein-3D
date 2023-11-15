@@ -66,7 +66,6 @@ int parsing_floor_ceiling(char **line)
     while (line[i] != NULL)
     {
         j = 0;
-        // printf("|%s|\n", line[i]);
         while(line[i][j] != '\0')
         {
             if(!is_digit(line[i][j]))
@@ -75,9 +74,11 @@ int parsing_floor_ceiling(char **line)
         }
         i++;
     }
-    // printf("i = %d\n", i);
+    if(i != 3)
+        return (1);
     return (0);
 }
+
 int valid_range(int r, int g, int b)
 {
     if(r < 0 || r > 255)
@@ -195,6 +196,11 @@ int get_height(t_map *map)
     {
         count++;
         i++;
+    }
+    while(ft_strncmp(map->map[i - 1], "\0", 1) == 0)
+    {
+        i--;
+        count--;
     }
     return count;
 }
@@ -471,6 +477,7 @@ int update_map(t_map *map)
     char *tmp;
     tmp = NULL;
 
+
     while(i < map->map_height)
     {
         j = 0;
@@ -492,6 +499,12 @@ int update_map(t_map *map)
         tmp[j] = '\0';
         free(map->map[i]);
         map->map[i] = tmp;
+        i++;
+    }
+    while(map->map[i] != NULL)
+    {
+        free(map->map[i]);
+        map->map[i] = NULL;
         i++;
     }
     return (0);
@@ -649,8 +662,6 @@ int main(int ac, char **av)
     int fd;
     t_map *map;
     map = NULL;
-    // t_data data;
-    // data.mlx_ptr = mlx_init();
     atexit(f);
 
     if (ac != 2 || check_file(av[1]) == 0) 
@@ -696,6 +707,7 @@ int main(int ac, char **av)
         ft_free_map(&map);
         return (1);
     }
+
     if (get_player_position(map))
     {
         printf("Error\n");
@@ -752,6 +764,7 @@ int main(int ac, char **av)
     }
 
     ft_free_map(&map);
+    close(fd);
 
     return 0;
 } 

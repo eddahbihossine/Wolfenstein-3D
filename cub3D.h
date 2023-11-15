@@ -6,7 +6,7 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/11/15 16:28:51 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/11/15 18:25:43 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ char	**ft_split(char const *s, char c);
 void	ft_free(char **s);
 int size_line(char *line);
 char	*ft_strtrim(char const *s1, char const *set);
-
+int	ft_strncmp(const char *s1, const char *s2, size_t n);
 
 
 #endif
