@@ -241,15 +241,91 @@ int is_empty(char *line)
     return (0);
 
 }
+
+int get_north_exture(char *line, int *k, t_map *map)
+{
+    char *ptr;
+    ptr = ft_substr(line, 2, size_line(line) -2);
+    map->no = skip_space(ptr);
+    free(ptr);
+    *k += 1;
+    return (0);
+}
+
+int get_south_exture(char *line, int *k, t_map *map)
+{
+    char *ptr;
+    ptr = ft_substr(line, 2, size_line(line) -2);
+    map->so = skip_space(ptr);
+    free(ptr);
+    *k += 1;
+    return (0);
+}
+
+int get_west_exture(char *line, int *k, t_map *map)
+{
+    char *ptr;
+    ptr = ft_substr(line, 2, size_line(line) -2);
+    map->we = skip_space(ptr);
+    free(ptr);
+    *k += 1;
+    return (0);
+}
+
+int get_east_texture(char *line, int *k, t_map *map)
+{
+    char *ptr;
+    ptr = ft_substr(line, 2, size_line(line) -2);
+    map->ea = skip_space(ptr);
+    free(ptr);
+    *k += 1;
+    return (0);
+}
+
+int get_floor(char *line, int *k, t_map *map)
+{
+    char *ptr;
+    ptr = ft_substr(line, 1, size_line(line) -1);
+    if(init_floor(map, ptr))
+    {
+        free(ptr);
+        return (1);
+    }
+    free(ptr);
+    *k += 1;
+    return (0);
+}
+
+void get_map(t_map *map, int *k , int *i, char *line)
+{
+    if(*k == 6)
+    {
+        map->map[*i] = my_strdup(line);
+        *i += 1;   
+    }
+}
+
+int get_ceiling(char *line, int *k, t_map *map)
+{
+    char *ptr;
+    ptr = ft_substr(line, 1, size_line(line) -1);
+    if(init_floor(map, ptr))
+    {
+        free(ptr);
+        return (1);
+    }
+    free(ptr);
+    *k += 1;
+    return (0);
+}
+
 int init_all(t_map *map , int fd, char *str)
 {
     char *line;
     int i = 0;
     int count = 0;
-    char *ptr;
     int k = 0;
-    int j = count_lines(str);
-    init_map(map, j);
+    init_map(map, count_lines(str));
 
     while((line = get_next_line(fd)))
     {
@@ -262,66 +338,20 @@ int init_all(t_map *map , int fd, char *str)
         if(count < 6)
         {
             if(line[0]== 'N' && line[1] == 'O')
-            {
-                ptr = ft_substr(line, 2, size_line(line) -2);
-                map->no = skip_space(ptr);
-                free(ptr);
-                k++;
-            }
+                get_north_exture(line, &k, map);
             else if(line[0]== 'S' && line[1] == 'O')
-            {
-                ptr = ft_substr(line, 2, size_line(line) -2);
-                map->so = skip_space(ptr);
-                free(ptr);
-                k++;
-            }
+                get_south_exture(line, &k, map);
             else if(line[0]== 'W' && line[1] == 'E')
-            {
-                ptr = ft_substr(line, 2, size_line(line) -2);
-                map->we = skip_space(ptr);
-                free(ptr);
-                k++;
-            }
+                get_west_exture(line, &k, map);
             else if(line[0]== 'E' && line[1] == 'A')
-            {
-                ptr = ft_substr(line, 2, size_line(line) -2);
-                map->ea = skip_space(ptr);
-                free(ptr);
-                k++;
-            }
+                get_east_texture(line, &k, map);
             else if(line[0]== 'C')
-            {
-                ptr = ft_substr(line, 1, size_line(line) -1);
-                if(init_ceiling(map, ptr))
-                {
-                    free(ptr);
-                    free(line);
-                    return (1);
-                }
-                free(ptr);
-                k++;
-            }
+                get_ceiling(line, &k, map);
             else if(line[0]== 'F')
-            {
-                ptr = ft_substr(line, 1, size_line(line) -1);
-                if(init_floor(map, ptr))
-                {
-                    free(ptr);
-                    free(line);
-                    return (1);
-                }
-                free(ptr);
-                k++;
-            }
+                get_floor(line, &k, map);
         }
         else
-        {
-            if(k == 6)
-            {
-                map->map[i] = my_strdup(line);
-                i++;
-            }
-        }
+            get_map(map, &k, &i, line);
         free(line);
         count++;
     }
