@@ -528,9 +528,7 @@ int valid_walls(t_map *map)
                     if (map->map[i][j]  == '0')
                     {
                         if(map->map[i][j - 1] == '0')
-                        {
                             return (1);
-                        }
                     }
                 }
                 if (map->map[i][j]  == '0')
@@ -542,9 +540,7 @@ int valid_walls(t_map *map)
             if (map->map[i][j] == '0' && i != 0 && i != map->map_height - 1 && j != 0 && j != map->map_width - 1)
             {
                 if (map->map[i - 1][j] == ' ' || map->map[i + 1][j] == ' ' || map->map[i][j - 1] == ' ' || map->map[i][j + 1] == ' ')
-                {
                     return (1);
-                }
             }
             j++;
         }
@@ -552,6 +548,7 @@ int valid_walls(t_map *map)
     }
     return (0);
 }
+
 int valid_position(t_map *map)
 {
     int i = 0;
@@ -573,31 +570,60 @@ int valid_position(t_map *map)
     return (0);
 }
 
+int front_wall(char *line)
+{
+    int i = 0;
+    char *wall;
+
+    wall = ft_strtrim(line, " ");
+    while (wall[i] != '\0') 
+    {
+        while(wall[i] == ' ')
+            i++;
+        if (wall[i] != '1') 
+        {
+            free(wall);
+            return 1;
+        }
+        i++;
+    }
+    free(wall);
+    return (0);
+}
+
+int back_wall(char *line)
+{
+    int i = 0;
+    char *wall;
+
+    wall = ft_strtrim(line, " ");
+    while (wall[i] != '\0') 
+    {
+        while(wall[i] == ' ')
+            i++;
+        if (wall[i] != '1') 
+        {
+            free(wall);
+            return 1;
+        }
+        i++;
+    }
+    free(wall);
+    return (0);
+}
+
 
 int wall_check(t_map *map) 
 {
     int i;
     char *wall;
 
+    i = 0;
     if (map == NULL || map->map == NULL || map->map[0] == NULL) 
-    {
         return 1;
-    }
-        i = 0;
-
-        wall = ft_strtrim(map->map[0], " ");
-        while (wall[i] != '\0') 
-        {
-            if (wall[i] != '1') 
-            {
-                free(wall);
-                return 1;
-            }
-            i++;
-        }
-        free(wall);
-        i = 1;
-
+    if(front_wall(map->map[0]))
+        return (1);
+    i = 1;
     while (map->map[i] != NULL) 
     {
         if(map->map[i + 1] == NULL)
@@ -611,25 +637,9 @@ int wall_check(t_map *map)
         free(wall);
         i++;
     }
-
-    wall = ft_strtrim(map->map[i], " ");
-    i = 0;
-    while (wall[i] != '\0') 
-    {
-        while(wall[i] == ' ')
-            i++;
-    
-        if (wall[i] != '1') 
-        {
-            free(wall);
-            return 1;
-        }
-        i++;
-    }
-    free(wall);
-
+    if(back_wall(map->map[i]))
+        return (1);
     return 0;
-
 }
 
 int get_player_position(t_map *map)
