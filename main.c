@@ -322,7 +322,6 @@ int init_all(t_map *map , int fd, char *str)
                 i++;
             }
         }
-
         free(line);
         count++;
     }
@@ -458,9 +457,7 @@ int check_wall(t_map *map)
         while (map->map[i][j] != '\0')
         {
             if (map->map[i][j] == '2')
-            {
                     return (1);
-            }
             j++;
         }
         i++;
@@ -751,8 +748,6 @@ int main(int ac, char **av)
         ft_free_map(&map);
         return (1);
     }
-
-    
 
    
     printf("%s\n", map->no);
