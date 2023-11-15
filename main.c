@@ -309,7 +309,7 @@ int get_ceiling(char *line, int *k, t_map *map)
 {
     char *ptr;
     ptr = ft_substr(line, 1, size_line(line) -1);
-    if(init_floor(map, ptr))
+    if(init_ceiling(map, ptr))
     {
         free(ptr);
         return (1);
@@ -334,7 +334,6 @@ int init_all(t_map *map , int fd, char *str)
             free(line);
             continue;
         }
-
         if(count < 6)
         {
             if(line[0]== 'N' && line[1] == 'O')
@@ -356,13 +355,11 @@ int init_all(t_map *map , int fd, char *str)
         count++;
     }
     map->map[i] = NULL;
-   
     close(fd);
     if(k != 6)
         return (1);
     return (0);
 }
-
 
 void   ft_free_map(t_map **map)
 {
