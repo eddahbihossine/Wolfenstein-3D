@@ -97,10 +97,8 @@ int init_floor(t_map *map, char *ptr)
 
     tmp = skip_space(ptr);
     if(parsing_coma(tmp))
-    {
-        free(tmp);
-        return (1);
-    }
+        return (free(tmp), 1);
+    
     split = ft_split(tmp, ',');
     if(parsing_floor_ceiling(split))
     {
@@ -127,19 +125,10 @@ int init_ceiling(t_map *map, char *line)
     ptr = ft_substr(line, 1, ft_strlen(line));
     tmp = skip_space(ptr);
     if(parsing_coma(tmp))
-    {
-        free(tmp);
-        free(ptr);
-        return (1);
-    }
+        return (free(tmp),free(ptr),1);
     split = ft_split(tmp, ',');
     if(parsing_floor_ceiling(split))
-    {
-        ft_free(split);
-        free(tmp);
-        free(ptr);
-        return (1);
-    }
+        return (ft_free(split), free(tmp),free(ptr),1);
     map->ceiling.r = ft_atoi(split[0]);
     map->ceiling.g = ft_atoi(split[1]);
     map->ceiling.b = ft_atoi(split[2]);
@@ -242,7 +231,7 @@ int is_empty(char *line)
 
 }
 
-int get_north_exture(char *line, int *k, t_map *map)
+int get_north_texture(char *line, int *k, t_map *map)
 {
     char *ptr;
     ptr = ft_substr(line, 2, size_line(line) -2);
@@ -252,7 +241,7 @@ int get_north_exture(char *line, int *k, t_map *map)
     return (0);
 }
 
-int get_south_exture(char *line, int *k, t_map *map)
+int get_south_texture(char *line, int *k, t_map *map)
 {
     char *ptr;
     ptr = ft_substr(line, 2, size_line(line) -2);
@@ -262,7 +251,7 @@ int get_south_exture(char *line, int *k, t_map *map)
     return (0);
 }
 
-int get_west_exture(char *line, int *k, t_map *map)
+int get_west_texture(char *line, int *k, t_map *map)
 {
     char *ptr;
     ptr = ft_substr(line, 2, size_line(line) -2);
@@ -319,14 +308,33 @@ int get_ceiling(char *line, int *k, t_map *map)
     return (0);
 }
 
+void all_texture(t_map *map, char *line, int *k)
+{
+    if(line[0]== 'N' && line[1] == 'O' && !map->no)
+        get_north_texture(line, k, map);
+    else if(line[0]== 'S' && line[1] == 'O' && !map->so)
+        get_south_texture(line, k, map);
+    else if(line[0]== 'W' && line[1] == 'E' && !map->we)
+        get_west_texture(line, k, map);
+    else if(line[0]== 'E' && line[1] == 'A' && !map->ea)
+        get_east_texture(line, k, map);
+    else if(line[0]== 'C' && map->ceiling.r == -42)
+        get_ceiling(line, k, map);
+    else if(line[0]== 'F' && map->floor.r == -42)
+        get_floor(line, k, map);
+}
+
 int init_all(t_map *map , int fd, char *str)
 {
     char *line;
-    int i = 0;
-    int count = 0;
-    int k = 0;
-    init_map(map, count_lines(str));
+    int i;
+    int count;
+    int k;
 
+    count = 0;
+    i = 0;
+    k = 0;
+    init_map(map, count_lines(str));
     while((line = get_next_line(fd)))
     {
         if(is_empty(line) == 1 && map->map[0] == NULL)
@@ -335,20 +343,7 @@ int init_all(t_map *map , int fd, char *str)
             continue;
         }
         if(count < 6)
-        {
-            if(line[0]== 'N' && line[1] == 'O')
-                get_north_exture(line, &k, map);
-            else if(line[0]== 'S' && line[1] == 'O')
-                get_south_exture(line, &k, map);
-            else if(line[0]== 'W' && line[1] == 'E')
-                get_west_exture(line, &k, map);
-            else if(line[0]== 'E' && line[1] == 'A')
-                get_east_texture(line, &k, map);
-            else if(line[0]== 'C')
-                get_ceiling(line, &k, map);
-            else if(line[0]== 'F')
-                get_floor(line, &k, map);
-        }
+            all_texture(map, line, &k);
         else
             get_map(map, &k, &i, line);
         free(line);
@@ -712,10 +707,10 @@ int main(int ac, char **av)
     map->map = NULL;
     map->map_width = 0;
     map->map_height = 0;
-    map->floor.r = 0;
+    map->floor.r = -42;
     map->floor.g = 0;
     map->floor.b = 0;
-    map->ceiling.r = 0;
+    map->ceiling.r = -42;
     map->ceiling.g = 0;
     map->ceiling.b = 0;
 
