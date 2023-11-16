@@ -619,9 +619,10 @@ int valid_position(t_map *map)
 
 int front_wall(char *line)
 {
-    int i = 0;
+    int i ;
     char *wall;
 
+    i = 0;
     wall = ft_strtrim(line, " ");
     while (wall[i] != '\0') 
     {
@@ -640,9 +641,10 @@ int front_wall(char *line)
 
 int back_wall(char *line)
 {
-    int i = 0;
+    int i;
     char *wall;
 
+    i = 0;
     wall = ft_strtrim(line, " ");
     while (wall[i] != '\0') 
     {
@@ -711,6 +713,42 @@ int get_player_position(t_map *map)
     return (1);
 }
 
+int parsing_map(t_map *map , int fd, char *str)
+{
+    if(init_all(map, fd, str) || check_player_position(map))
+        return (1);
+    if(update_map(map) || check_wall(map))
+        return (1);
+    if (get_player_position(map))
+        return (1);
+     if (check_valid_map(map))
+        return (1);
+    if (valid_walls(map))
+        return (1);
+    if (wall_check(map))
+        return (1);
+    if (valid_position(map))
+        return (1);
+    return (0);
+}
+
+void init__map(t_map *map)
+{
+    map->no = NULL;
+    map->so = NULL;
+    map->we = NULL;
+    map->ea = NULL;
+    map->map = NULL;
+    map->map_width = 0;
+    map->map_height = 0;
+    map->floor.r = -42;
+    map->floor.g = 0;
+    map->floor.b = 0;
+    map->ceiling.r = -42;
+    map->ceiling.g = 0;
+    map->ceiling.b = 0;
+}
+
 
 int main(int ac, char **av) 
 {
@@ -726,77 +764,19 @@ int main(int ac, char **av)
     }
     map = malloc(sizeof(t_map));
 
-    map->no = NULL;
-    map->so = NULL;
-    map->we = NULL;
-    map->ea = NULL;
-    map->map = NULL;
-    map->map_width = 0;
-    map->map_height = 0;
-    map->floor.r = -42;
-    map->floor.g = 0;
-    map->floor.b = 0;
-    map->ceiling.r = -42;
-    map->ceiling.g = 0;
-    map->ceiling.b = 0;
-
-
+    init__map(map);
     fd = open(av[1], O_RDONLY);
-
     if (fd == -1) 
     {
         printf("Error opening file\n");
         return 1;
     }
-
-    if(init_all(map, fd, av[1]) || check_player_position(map))
+    if (parsing_map(map, fd, av[1]))
     {
         printf("Error\n");
         ft_free_map(&map);
         return (1);
     }
-
-    if(update_map(map) || check_wall(map))
-    {
-        printf("Error\n");
-        ft_free_map(&map);
-        return (1);
-    }
-
-    if (get_player_position(map))
-    {
-        printf("Error\n");
-        ft_free_map(&map);
-        return (1);
-    }
- 
-    if (check_valid_map(map))
-    {
-        printf("Error\n");
-        ft_free_map(&map);
-        return (1);
-    }
-    if (valid_walls(map))
-    {
-        printf("Error\n");
-        ft_free_map(&map);
-        return (1);
-    }
-
-    if (wall_check(map))
-    {
-        printf("Error\n");
-        ft_free_map(&map);
-        return (1);
-    }
-
-    if (valid_position(map))
-    {
-        printf("Error\n");
-        ft_free_map(&map);
-        return (1);
-    }
-
    
     printf("%s\n", map->no);
     printf("%s\n", map->so);
@@ -815,7 +795,6 @@ int main(int ac, char **av)
         printf("%s\n", map->map[i]);
         i++;
     }
-
     ft_free_map(&map);
     close(fd);
 
