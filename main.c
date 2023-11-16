@@ -324,6 +324,16 @@ void all_texture(t_map *map, char *line, int *k)
         get_floor(line, k, map);
 }
 
+int check_empty_line(char *line, t_map *map)
+{
+   if(is_empty(line) == 1 && map->map[0] == NULL)
+    {
+        free(line);
+        return (1);
+    }
+    return (0);
+}
+
 int init_all(t_map *map , int fd, char *str)
 {
     char *line;
@@ -337,11 +347,8 @@ int init_all(t_map *map , int fd, char *str)
     init_map(map, count_lines(str));
     while((line = get_next_line(fd)))
     {
-        if(is_empty(line) == 1 && map->map[0] == NULL)
-        {
-            free(line);
+        if(check_empty_line(line, map))
             continue;
-        }
         if(count < 6)
             all_texture(map, line, &k);
         else
@@ -406,15 +413,39 @@ int check_player_position(t_map *map)
     return (0);
 }
 
+int min_line(t_map *map)
+{
+    int i;
+    int min;
+    int k ;
+    int j;
 
+    i = 0;
+    k = 0;
+    min = map->map_width;
+    while(ft_strncmp(map->map[i], "\0", 1) == 0)
+    {
+        i++;
+        k++;
+    }
+    while (map->map[i] != NULL)
+    {
+        j = 0;
+        while (map->map[i][j] != '\0')
+            j++;
+        if (j < min)
+            min = j;
+        i++;
+    }
+    if(min < 6 || i - k < 5)
+        return (1);
+    return (0);
+}
 
 int check_valid_map(t_map *map)
 {
     int i = 0;
     int j = 0;
-    int k = 0;
-    int min = 0;
-    min = map->map_width;
     while (map->map[i] != NULL)
     {
         j = 0;
@@ -429,27 +460,11 @@ int check_valid_map(t_map *map)
         i++;
     }
     i = 0;
-    while(strcmp(map->map[i], "\0") == 0)
-    {
-        i++;
-        k++;
-    }
-    while (map->map[i] != NULL)
-    {
-        j = 0;
-        while (map->map[i][j] != '\0')
-        {
-            j++;
-        }
-        if (j < min)
-            min = j;
-        i++;
-    }
-
-    if(min < 6 || i - k < 5)
+    if(min_line(map))
         return (1);
     return (0);
 }
+
 int get_longest_line(t_map *map)
 {
     int i = 0;
@@ -487,16 +502,32 @@ int check_wall(t_map *map)
     return (0);
 }
 
-int update_map(t_map *map)
+void init_widht_height(t_map *map)
 {
     map->map_width = get_longest_line(map);
     map->map_height = get_height(map);
-    int i = 0;
-    int j = 0;
+}
+
+void free_empty_line(t_map *map , int *i)
+{
+    while(map->map[*i] != NULL)
+    {
+        free(map->map[*i]);
+        map->map[*i] = NULL;
+        *i += 1;
+    }
+}
+
+int update_map(t_map *map)
+{
+    int i;
+    int j ;
     char *tmp;
+
+    i = 0;
+    j = 0;
     tmp = NULL;
-
-
+    init_widht_height(map);
     while(i < map->map_height)
     {
         j = 0;
@@ -512,7 +543,6 @@ int update_map(t_map *map)
             }
             else
                 tmp[j] = '\0';
-            
             j++;
         }
         tmp[j] = '\0';
@@ -520,47 +550,45 @@ int update_map(t_map *map)
         map->map[i] = tmp;
         i++;
     }
-    while(map->map[i] != NULL)
+    free_empty_line(map, &i);
+    return (0);
+}
+
+int valid_wall_help(t_map *map, int i, int j)
+{
+    if(i == map->map_height - 1)
     {
-        free(map->map[i]);
-        map->map[i] = NULL;
-        i++;
+        if (map->map[i][j]  == '0')
+        {
+            if(map->map[i][j - 1] == '0')
+                return (1);
+        }
+    }
+    if (map->map[i][j]  == '0')
+    {
+        if(map->map[i][j + 1] == '0')
+            return (1);
     }
     return (0);
 }
 
 int valid_walls(t_map *map)
 {
-    int i = 0;
-    int j = 0;
+    int i ;
+    int j;
 
-
+    i = 0;
     while (map->map[i] != NULL)
     {
         j = 0;
         while (map->map[i][j] != '\0')
         {
             if (i == 0 || i == map->map_height - 1)
-            {
-                if(i == map->map_height - 1)
-                {
-                    if (map->map[i][j]  == '0')
-                    {
-                        if(map->map[i][j - 1] == '0')
-                            return (1);
-                    }
-                }
-                if (map->map[i][j]  == '0')
-                {
-                    if(map->map[i][j + 1] == '0')
-                        return (1);
-                }
-            }
+                if(valid_wall_help(map, i, j))
+                    return (1);
             if (map->map[i][j] == '0' && i != 0 && i != map->map_height - 1 && j != 0 && j != map->map_width - 1)
-            {
                 if (map->map[i - 1][j] == ' ' || map->map[i + 1][j] == ' ' || map->map[i][j - 1] == ' ' || map->map[i][j + 1] == ' ')
                     return (1);
-            }
             j++;
         }
         i++;
@@ -631,7 +659,6 @@ int back_wall(char *line)
     return (0);
 }
 
-
 int wall_check(t_map *map) 
 {
     int i;
@@ -683,7 +710,6 @@ int get_player_position(t_map *map)
     }
     return (1);
 }
-
 
 
 int main(int ac, char **av) 
