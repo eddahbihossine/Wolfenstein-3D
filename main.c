@@ -748,13 +748,22 @@ void init__map(t_map *map)
     map->ceiling.g = 0;
     map->ceiling.b = 0;
 }
-
+void ft_free_window(t_mlx **window)
+{
+    if((*window)->map)
+        ft_free_map(&(*window)->map);
+    if((*window)->mlx)
+        free((*window)->mlx);
+    if((*window)->img)
+        free((*window)->img);
+    free(*window);
+}
 
 int main(int ac, char **av) 
 {
     int fd;
-    t_map *map;
-    map = NULL;
+    t_mlx *window;
+    window = malloc(sizeof(t_mlx));
     atexit(f);
 
     if (ac != 2 || check_file(av[1]) == 0) 
@@ -762,41 +771,40 @@ int main(int ac, char **av)
         printf("Error\n");
         return (1);
     }
-    map = malloc(sizeof(t_map));
+    window->map = malloc(sizeof(t_map));
 
-    init__map(map);
+    init__map(window->map);
     fd = open(av[1], O_RDONLY);
     if (fd == -1) 
     {
         printf("Error opening file\n");
         return 1;
     }
-    if (parsing_map(map, fd, av[1]))
+    if (parsing_map(window->map, fd, av[1]))
     {
         printf("Error\n");
-        ft_free_map(&map);
+        ft_free_window(&window);
         return (1);
     }
    
-    printf("%s\n", map->no);
-    printf("%s\n", map->so);
-    printf("%s\n", map->we);
-    printf("%s\n", map->ea);
-    printf("%d\n", map->floor.r);
-    printf("%d\n", map->floor.g);
-    printf("%d\n", map->floor.b);
-    printf("%d\n", map->ceiling.r);
-    printf("%d\n", map->ceiling.g);
-    printf("%d\n", map->ceiling.b);
+    // printf("%s\n", map->no);
+    // printf("%s\n", map->so);
+    // printf("%s\n", map->we);
+    // printf("%s\n", map->ea);
+    // printf("%d\n", map->floor.r);
+    // printf("%d\n", map->floor.g);
+    // printf("%d\n", map->floor.b);
+    // printf("%d\n", map->ceiling.r);
+    // printf("%d\n", map->ceiling.g);
+    // printf("%d\n", map->ceiling.b);
 
     int i = 0;
-    while (map->map[i] != NULL)
+    while(window->map->map[i] != NULL)
     {
-        printf("%s\n", map->map[i]);
+        printf("%s\n", window->map->map[i]);
         i++;
     }
-    ft_free_map(&map);
+    ft_free_window(&window);
     close(fd);
-
     return 0;
 } 

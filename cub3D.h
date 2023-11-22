@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3D.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
+/*   By: heddahbi <heddahbi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/11/15 18:25:43 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/11/22 16:31:07 by heddahbi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <math.h>
-# include <mlx.h>
+#include "./MLX42/include/MLX42/MLX42.h"
 # include <string.h>
 #ifndef BUFFER_SIZE
 # define BUFFER_SIZE 42
@@ -52,20 +52,13 @@ typedef struct	s_map
     t_player player;
 }				t_map;
 
-typedef struct	s_data
+typedef struct s_mlx
 {
-    void	*mlx_ptr;
-    void	*mlx_win;
-    void	*img;
-    char	*addr;
-    int    width;
-    int    height;
-    int		bits_per_pixel;
-	int		line_length;
-	int		endian;
-    t_map  map;
-  
-}				t_data;
+    mlx_t    *mlx;
+    mlx_image_t *img;
+    t_map *map;
+    
+} t_mlx;
 
 char	*get_next_line(int fd);
 char	*ft_strjoin(char const *s1, char const *s2);
