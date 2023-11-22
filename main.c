@@ -73,7 +73,7 @@ int parsing_floor_ceiling(char **line)
         while(p[j] != '\0')
         {
             if(!is_digit(p[j]))
-                return (1);
+                return (free(p), 1);
             j++;
         }
         free(p);
