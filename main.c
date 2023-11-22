@@ -773,23 +773,21 @@ int main(int ac, char **av)
         printf("Error\n");
         return (1);
     }
-    window = malloc(sizeof(t_mlx));
-    if(!window)
-        return (1);
-    // mlx_draw_rect(window->img, 100, 100, 0x00FFFFF0);
-    // mlx_image_to_window(window->mlx, window->img, 0, 0);
-    // window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
-    // window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
-    window->map = malloc(sizeof(t_map));
-    if(!window->map)
-        return (1);
-    init__map(window->map);
+
     fd = open(av[1], O_RDONLY);
     if (fd == -1) 
     {
         printf("Error opening file\n");
         return 1;
     }
+    window = malloc(sizeof(t_mlx));
+    // mlx_draw_rect(window->img, 100, 100, 0x00FFFFF0);
+    // mlx_image_to_window(window->mlx, window->img, 0, 0);
+    // window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
+    // window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
+    window->map = malloc(sizeof(t_map));
+
+    init__map(window->map);
     if (parsing_map(window->map, fd, av[1]))
     {
         printf("Error\n");
@@ -797,22 +795,22 @@ int main(int ac, char **av)
         return (1);
 
     }
-    printf("%s\n", window->map->no);
-    printf("%s\n", window->map->so);
-    printf("%s\n", window->map->we);
-    printf("%s\n", window->map->ea);
-    printf("%d\n", window->map->floor.r);
-    printf("%d\n", window->map->floor.g);
-    printf("%d\n", window->map->floor.b);
-    printf("%d\n", window->map->ceiling.r);
-    printf("%d\n", window->map->ceiling.g);
-    printf("%d\n", window->map->ceiling.b);
-    int i = 0;
-    while (window->map->map[i] != NULL)
-    {
-        printf("%s\n", window->map->map[i]);
-        i++;
-    }
+    // printf("%s\n", window->map->no);
+    // printf("%s\n", window->map->so);
+    // printf("%s\n", window->map->we);
+    // printf("%s\n", window->map->ea);
+    // printf("%d\n", window->map->floor.r);
+    // printf("%d\n", window->map->floor.g);
+    // printf("%d\n", window->map->floor.b);
+    // printf("%d\n", window->map->ceiling.r);
+    // printf("%d\n", window->map->ceiling.g);
+    // printf("%d\n", window->map->ceiling.b);
+    // int i = 0;
+    // while (window->map->map[i] != NULL)
+    // {
+    //     printf("%s\n", window->map->map[i]);
+    //     i++;
+    // }
     // mlx_draw_rect(window->img, window->map->player.x, window->map->player.y, 0x00FF0000);
     // mlx_loop(window->mlx);
     // mlx_loop_hook(window->mlx, &hook_stuff, window);
