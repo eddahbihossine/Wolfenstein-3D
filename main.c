@@ -750,22 +750,52 @@ void init__map(t_map *map)
 }
 void ft_free_window(t_mlx **window)
 {
-    if((*window)->map)
-        ft_free_map(&(*window)->map);
-    if((*window)->mlx)
-        free((*window)->mlx);
-    if((*window)->img)
-        free((*window)->img);
-    free(*window);
+    ft_free_map(&(*window)->map);
+    free((*window));
 }
+// void print_stuff()
+void hook_stuff(void *params)
+{
+    t_mlx *window;
+    window = (t_mlx *)params;
+    // if(mlx_is_key_down())
 
+}
+void mlx_draw_rect(mlx_image_t *img, int x, int y, int color)
+{
+    int i;
+    int j;
+
+    i = 0;
+    color = 0x00FFFFF;
+    while (i < HEIGHT)
+    {
+        j = 0;
+        while (j < WIDTH)
+        {
+            mlx_put_pixel(img, x + j, y + i,color );
+            j++;
+        }
+        i++;
+    }
+}
+  
 int main(int ac, char **av) 
 {
     int fd;
+    atexit(f);
     t_mlx *window;
     window = malloc(sizeof(t_mlx));
-    atexit(f);
-
+    window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
+    window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
+    if(!window->mlx || !window->img)
+    {
+        printf("Error\n");
+        exit(1);
+    }
+    puts("hello segv ");
+    mlx_draw_rect(window->img, 100, 100, 0x00FF0000);
+    mlx_image_to_window(window->mlx, window->img, 0, 0);
     if (ac != 2 || check_file(av[1]) == 0) 
     {
         printf("Error\n");
@@ -785,8 +815,9 @@ int main(int ac, char **av)
         printf("Error\n");
         ft_free_window(&window);
         return (1);
+
     }
-   
+    // mlx_draw_rect(window->img, window->map->player.x, window->map->player.y, 0x00FF0000);
     // printf("%s\n", map->no);
     // printf("%s\n", map->so);
     // printf("%s\n", map->we);
@@ -797,13 +828,8 @@ int main(int ac, char **av)
     // printf("%d\n", map->ceiling.r);
     // printf("%d\n", map->ceiling.g);
     // printf("%d\n", map->ceiling.b);
-
-    int i = 0;
-    while(window->map->map[i] != NULL)
-    {
-        printf("%s\n", window->map->map[i]);
-        i++;
-    }
+    mlx_loop(window->mlx);
+    mlx_loop_hook(window->mlx, &hook_stuff, window);
     ft_free_window(&window);
     close(fd);
     return 0;
