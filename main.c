@@ -61,17 +61,22 @@ int parsing_coma(char *line)
 
 int parsing_floor_ceiling(char **line)
 {
-    int i = 0;
+    int i;
     int j ;
+    char *p;
+
+    i = 0;
     while (line[i] != NULL)
     {
         j = 0;
-        while(line[i][j] != '\0')
+        p = ft_strtrim(line[i], "' ' '\t' '\n' '\v' '\f' '\r'");
+        while(p[j] != '\0')
         {
-            if(!is_digit(line[i][j]))
+            if(!is_digit(p[j]))
                 return (1);
             j++;
         }
+        free(p);
         i++;
     }
     if(i != 3)
@@ -792,22 +797,22 @@ int main(int ac, char **av)
         return (1);
 
     }
-    // printf("%s\n", window->map->no);
-    // printf("%s\n", window->map->so);
-    // printf("%s\n", window->map->we);
-    // printf("%s\n", window->map->ea);
-    // printf("%d\n", window->map->floor.r);
-    // printf("%d\n", window->map->floor.g);
-    // printf("%d\n", window->map->floor.b);
-    // printf("%d\n", window->map->ceiling.r);
-    // printf("%d\n", window->map->ceiling.g);
-    // printf("%d\n", window->map->ceiling.b);
-    // int i = 0;
-    // while (window->map->map[i] != NULL)
-    // {
-    //     printf("%s\n", window->map->map[i]);
-    //     i++;
-    // }
+    printf("%s\n", window->map->no);
+    printf("%s\n", window->map->so);
+    printf("%s\n", window->map->we);
+    printf("%s\n", window->map->ea);
+    printf("%d\n", window->map->floor.r);
+    printf("%d\n", window->map->floor.g);
+    printf("%d\n", window->map->floor.b);
+    printf("%d\n", window->map->ceiling.r);
+    printf("%d\n", window->map->ceiling.g);
+    printf("%d\n", window->map->ceiling.b);
+    int i = 0;
+    while (window->map->map[i] != NULL)
+    {
+        printf("%s\n", window->map->map[i]);
+        i++;
+    }
     // mlx_draw_rect(window->img, window->map->player.x, window->map->player.y, 0x00FF0000);
     // mlx_loop(window->mlx);
     // mlx_loop_hook(window->mlx, &hook_stuff, window);
