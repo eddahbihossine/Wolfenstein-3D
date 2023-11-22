@@ -310,6 +310,7 @@ int get_ceiling(char *line, int *k, t_map *map)
 
 void all_texture(t_map *map, char *line, int *k)
 {
+    line = skip_space(line);
     if(line[0]== 'N' && line[1] == 'O' && !map->no)
         get_north_texture(line, k, map);
     else if(line[0]== 'S' && line[1] == 'O' && !map->so)
@@ -322,6 +323,7 @@ void all_texture(t_map *map, char *line, int *k)
         get_ceiling(line, k, map);
     else if(line[0]== 'F' && map->floor.r == -42)
         get_floor(line, k, map);
+    free(line);
 }
 
 int check_empty_line(char *line, t_map *map)
@@ -413,34 +415,6 @@ int check_player_position(t_map *map)
     return (0);
 }
 
-int min_line(t_map *map)
-{
-    int i;
-    int min;
-    int k ;
-    int j;
-
-    i = 0;
-    k = 0;
-    min = map->map_width;
-    while(ft_strncmp(map->map[i], "\0", 1) == 0)
-    {
-        i++;
-        k++;
-    }
-    while (map->map[i] != NULL)
-    {
-        j = 0;
-        while (map->map[i][j] != '\0')
-            j++;
-        if (j < min)
-            min = j;
-        i++;
-    }
-    if(min < 6 || i - k < 5)
-        return (1);
-    return (0);
-}
 
 int check_valid_map(t_map *map)
 {
@@ -460,8 +434,6 @@ int check_valid_map(t_map *map)
         i++;
     }
     i = 0;
-    if(min_line(map))
-        return (1);
     return (0);
 }
 
@@ -587,8 +559,12 @@ int valid_walls(t_map *map)
                 if(valid_wall_help(map, i, j))
                     return (1);
             if (map->map[i][j] == '0' && i != 0 && i != map->map_height - 1 && j != 0 && j != map->map_width - 1)
-                if (map->map[i - 1][j] == ' ' || map->map[i + 1][j] == ' ' || map->map[i][j - 1] == ' ' || map->map[i][j + 1] == ' ')
+            {
+                if ((map->map[i - 1][j] == ' ' || map->map[i + 1][j] == ' ' || map->map[i][j - 1] == ' ' || map->map[i][j + 1] == ' ') \
+                    || (map->map[i - 1][j] == '\0' || map->map[i + 1][j] == '\0' || map->map[i][j - 1] == '\0' || map->map[i][j + 1] == '\0'))
                     return (1);
+                 
+            }
             j++;
         }
         i++;
@@ -748,6 +724,7 @@ void init__map(t_map *map)
     map->ceiling.g = 0;
     map->ceiling.b = 0;
 }
+
 void ft_free_window(t_mlx **window)
 {
     ft_free_map(&(*window)->map);
@@ -768,13 +745,12 @@ void mlx_draw_rect(mlx_image_t *img, int x, int y, int color)
     int j;
 
     i = 0;
-    color = 0x00FFFFF;
-    while (i < HEIGHT)
+    while (i < 10)
     {
         j = 0;
-        while (j < WIDTH)
+        while (j < 10)
         {
-            mlx_put_pixel(img, x + j, y + i,color );
+            mlx_put_pixel(img, x + i, y + j, color);
             j++;
         }
         i++;
@@ -785,25 +761,23 @@ int main(int ac, char **av)
 {
     int fd;
     atexit(f);
-    t_mlx *window;
-    window = malloc(sizeof(t_mlx));
-    window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
-    window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
-    if(!window->mlx || !window->img)
-    {
-        printf("Error\n");
-        exit(1);
-    }
-    puts("hello segv ");
-    mlx_draw_rect(window->img, 100, 100, 0x00FF0000);
-    mlx_image_to_window(window->mlx, window->img, 0, 0);
+    t_mlx *window = NULL;
+    
     if (ac != 2 || check_file(av[1]) == 0) 
     {
         printf("Error\n");
         return (1);
     }
+    window = malloc(sizeof(t_mlx));
+    if(!window)
+        return (1);
+    // mlx_draw_rect(window->img, 100, 100, 0x00FFFFF0);
+    // mlx_image_to_window(window->mlx, window->img, 0, 0);
+    // window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
+    // window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
     window->map = malloc(sizeof(t_map));
-
+    if(!window->map)
+        return (1);
     init__map(window->map);
     fd = open(av[1], O_RDONLY);
     if (fd == -1) 
@@ -818,19 +792,25 @@ int main(int ac, char **av)
         return (1);
 
     }
+    // printf("%s\n", window->map->no);
+    // printf("%s\n", window->map->so);
+    // printf("%s\n", window->map->we);
+    // printf("%s\n", window->map->ea);
+    // printf("%d\n", window->map->floor.r);
+    // printf("%d\n", window->map->floor.g);
+    // printf("%d\n", window->map->floor.b);
+    // printf("%d\n", window->map->ceiling.r);
+    // printf("%d\n", window->map->ceiling.g);
+    // printf("%d\n", window->map->ceiling.b);
+    // int i = 0;
+    // while (window->map->map[i] != NULL)
+    // {
+    //     printf("%s\n", window->map->map[i]);
+    //     i++;
+    // }
     // mlx_draw_rect(window->img, window->map->player.x, window->map->player.y, 0x00FF0000);
-    // printf("%s\n", map->no);
-    // printf("%s\n", map->so);
-    // printf("%s\n", map->we);
-    // printf("%s\n", map->ea);
-    // printf("%d\n", map->floor.r);
-    // printf("%d\n", map->floor.g);
-    // printf("%d\n", map->floor.b);
-    // printf("%d\n", map->ceiling.r);
-    // printf("%d\n", map->ceiling.g);
-    // printf("%d\n", map->ceiling.b);
-    mlx_loop(window->mlx);
-    mlx_loop_hook(window->mlx, &hook_stuff, window);
+    // mlx_loop(window->mlx);
+    // mlx_loop_hook(window->mlx, &hook_stuff, window);
     ft_free_window(&window);
     close(fd);
     return 0;
