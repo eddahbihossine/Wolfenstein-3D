@@ -756,8 +756,9 @@ void ft_free_window(t_mlx **window)
 // void print_stuff()
 void hook_stuff(void *params)
 {
-    t_mlx *window;
-    window = (t_mlx *)params;
+    (void)params;
+    // t_mlx *window;
+    // window = (t_mlx *)params;
     // if(mlx_is_key_down())
 
 }
