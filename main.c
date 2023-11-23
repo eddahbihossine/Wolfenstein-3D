@@ -689,7 +689,7 @@ int wall_check(t_map *map)
         return (1);
     return 0;
 }
-
+void mlx_draw_rect(mlx_image_t *img, int x, int y, int color);
 int get_player_position(t_map *map)
 {
     int i = 0;
@@ -756,11 +756,65 @@ void ft_free_window(t_mlx **window)
 // void print_stuff()
 void hook_stuff(void *params)
 {
-    (void)params;
-    // t_mlx *window;
-    // window = (t_mlx *)params;
-    // if(mlx_is_key_down())
+    t_mlx *mlx = (t_mlx *)params;
 
+    if(mlx_is_key_down(mlx->mlx, ESC))
+        exit(0);
+}
+void mlx_draw_square(t_mlx *mlx, int x, int y, int color)
+{
+    int i;
+    int j;
+
+    i = 0;
+    while (i < 64)
+    {
+        j = 0;
+        while (j < 64)
+        {
+            mlx_put_pixel(mlx->img, x + j, y + i, color);
+            j++;
+        }
+        i++;
+    }
+}
+void draw_walls2d(t_mlx *mlx, int x, int y, int color)
+{
+    int i;
+    int j;
+
+    while(y < HEIGHT)
+    {
+        x = 0;
+        while(x < WIDTH)
+        {
+        i = 0;
+        while (i < 64)
+        {
+            j = 0;
+            while (j < 64)
+            {
+                if(mlx->map->map[y / 64][x / 64] == '1')
+                    mlx_put_pixel(mlx->img, x + j, y + i, color);
+                else
+                {
+                    int xp = mlx->map->player.x * 64;
+                    int yp = mlx->map->player.y * 64;
+
+                    if(xp == x && yp == y)
+                        mlx_draw_square(mlx, x, y, 0x00FF0900);
+                     
+                }
+                j++;
+            }
+            i++;
+         }
+
+        x += 64;
+        }
+        y += 64;
+    }
+   
 }
 void mlx_draw_rect(mlx_image_t *img, int x, int y, int color)
 {
@@ -780,7 +834,11 @@ void mlx_draw_rect(mlx_image_t *img, int x, int y, int color)
         i++;
     }
 }
-  
+void init_map_shit(t_mlx *win)
+{
+    win->map->map_height= WIDTH;
+    win->map->map_width = HEIGHT;
+}
 int main(int ac, char **av) 
 {
     int fd;
@@ -795,12 +853,10 @@ int main(int ac, char **av)
         exit(1);
     }
     puts("hello segv ");
-    mlx_draw_rect(window->img, 100, 100, 0x00FF0000);
-    mlx_image_to_window(window->mlx, window->img, 0, 0);
     if (ac != 2 || check_file(av[1]) == 0) 
     {
         printf("Error\n");
-        return (1);
+        exit(1);
     }
     window->map = malloc(sizeof(t_map));
 
@@ -809,15 +865,19 @@ int main(int ac, char **av)
     if (fd == -1) 
     {
         printf("Error opening file\n");
+        ft_free_window(&window);
         return 1;
     }
     if (parsing_map(window->map, fd, av[1]))
     {
+        puts("ss");
         printf("Error\n");
         ft_free_window(&window);
         return (1);
 
     }
+    draw_walls2d(window,0,0,0x00FF);
+    // init_map_shit(window);
     // mlx_draw_rect(window->img, window->map->player.x, window->map->player.y, 0x00FF0000);
     // printf("%s\n", map->no);
     // printf("%s\n", map->so);
@@ -829,8 +889,9 @@ int main(int ac, char **av)
     // printf("%d\n", map->ceiling.r);
     // printf("%d\n", map->ceiling.g);
     // printf("%d\n", map->ceiling.b);
+    mlx_image_to_window(window->mlx, window->img, 0, 0);
+    mlx_loop_hook(window->mlx,&hook_stuff,window);
     mlx_loop(window->mlx);
-    mlx_loop_hook(window->mlx, &hook_stuff, window);
     ft_free_window(&window);
     close(fd);
     return 0;
