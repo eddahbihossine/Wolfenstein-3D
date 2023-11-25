@@ -6,7 +6,7 @@
 /*   By: heddahbi <heddahbi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/11/22 21:07:53 by heddahbi         ###   ########.fr       */
+/*   Updated: 2023/11/25 02:20:02 by heddahbi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ typedef struct	s_player
 {
     int	x;
     int	y;
+    int fov;
+    double angle;
 }				t_player;
 
 typedef struct  s_color

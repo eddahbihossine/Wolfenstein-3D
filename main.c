@@ -310,6 +310,7 @@ int get_ceiling(char *line, int *k, t_map *map)
 
 void all_texture(t_map *map, char *line, int *k)
 {
+    line = skip_space(line);
     if(line[0]== 'N' && line[1] == 'O' && !map->no)
         get_north_texture(line, k, map);
     else if(line[0]== 'S' && line[1] == 'O' && !map->so)
@@ -322,6 +323,7 @@ void all_texture(t_map *map, char *line, int *k)
         get_ceiling(line, k, map);
     else if(line[0]== 'F' && map->floor.r == -42)
         get_floor(line, k, map);
+    free(line);
 }
 
 int check_empty_line(char *line, t_map *map)
@@ -413,34 +415,6 @@ int check_player_position(t_map *map)
     return (0);
 }
 
-int min_line(t_map *map)
-{
-    int i;
-    int min;
-    int k ;
-    int j;
-
-    i = 0;
-    k = 0;
-    min = map->map_width;
-    while(ft_strncmp(map->map[i], "\0", 1) == 0)
-    {
-        i++;
-        k++;
-    }
-    while (map->map[i] != NULL)
-    {
-        j = 0;
-        while (map->map[i][j] != '\0')
-            j++;
-        if (j < min)
-            min = j;
-        i++;
-    }
-    if(min < 6 || i - k < 5)
-        return (1);
-    return (0);
-}
 
 int check_valid_map(t_map *map)
 {
@@ -460,8 +434,6 @@ int check_valid_map(t_map *map)
         i++;
     }
     i = 0;
-    if(min_line(map))
-        return (1);
     return (0);
 }
 
@@ -587,8 +559,12 @@ int valid_walls(t_map *map)
                 if(valid_wall_help(map, i, j))
                     return (1);
             if (map->map[i][j] == '0' && i != 0 && i != map->map_height - 1 && j != 0 && j != map->map_width - 1)
-                if (map->map[i - 1][j] == ' ' || map->map[i + 1][j] == ' ' || map->map[i][j - 1] == ' ' || map->map[i][j + 1] == ' ')
+            {
+                if ((map->map[i - 1][j] == ' ' || map->map[i + 1][j] == ' ' || map->map[i][j - 1] == ' ' || map->map[i][j + 1] == ' ') \
+                    || (map->map[i - 1][j] == '\0' || map->map[i + 1][j] == '\0' || map->map[i][j - 1] == '\0' || map->map[i][j + 1] == '\0'))
                     return (1);
+                 
+            }
             j++;
         }
         i++;
@@ -689,7 +665,7 @@ int wall_check(t_map *map)
         return (1);
     return 0;
 }
-void mlx_draw_rect(mlx_image_t *img, int x, int y, int color);
+
 int get_player_position(t_map *map)
 {
     int i = 0;
@@ -748,6 +724,10 @@ void init__map(t_map *map)
     map->ceiling.g = 0;
     map->ceiling.b = 0;
 }
+double radians_to_degrees(double radians) {
+    return radians * (180.0 / M_PI);
+}
+
 void ft_free_window(t_mlx **window)
 {
     ft_free_map(&(*window)->map);
@@ -756,142 +736,109 @@ void ft_free_window(t_mlx **window)
 // void print_stuff()
 void hook_stuff(void *params)
 {
-    t_mlx *mlx = (t_mlx *)params;
+    (void)params;
+    // t_mlx *window;
+    // window = (t_mlx *)params;
+    // if(mlx_is_key_down())
 
-    if(mlx_is_key_down(mlx->mlx, ESC))
-        exit(0);
 }
-void mlx_draw_square(t_mlx *mlx, int x, int y, int color)
+int check_whichside(t_mlx *win, int x, int y)
 {
-    int i;
-    int j;
-
-    i = 0;
-    while (i < 64)
-    {
-        j = 0;
-        while (j < 64)
-        {
-            mlx_put_pixel(mlx->img, x + j, y + i, color);
-            j++;
-        }
-        i++;
-    }
+    if (win->map->map[y][x] == 'N')
+        return (1);
+    if (win->map->map[y][x] == 'S')
+        return (2);
+    if (win->map->map[y][x] == 'W')
+        return (3);
+    if (win->map->map[y][x] == 'E')
+        return (4);
+    return (0);
 }
-void draw_walls2d(t_mlx *mlx, int x, int y, int color)
+void set_the_vision_angle(t_mlx *win, int side)
 {
-    int i;
-    int j;
-
-    while(y < HEIGHT)
-    {
-        x = 0;
-        while(x < WIDTH)
-        {
-        i = 0;
-        while (i < 64)
-        {
-            j = 0;
-            while (j < 64)
-            {
-                if(mlx->map->map[y / 64][x / 64] == '1')
-                    mlx_put_pixel(mlx->img, x + j, y + i, color);
-                else
-                {
-                    int xp = mlx->map->player.x * 64;
-                    int yp = mlx->map->player.y * 64;
-
-                    if(xp == x && yp == y)
-                        mlx_draw_square(mlx, x, y, 0x00FF0900);
-                     
-                }
-                j++;
-            }
-            i++;
-         }
-
-        x += 64;
-        }
-        y += 64;
-    }
+    if (side == 1)
+        win->map->player.angle = 3 * M_PI / 2;
+    if (side == 2)
+        win->map->player.angle = M_PI / 2;
+    if (side == 3)
+        win->map->player.angle = M_PI;
+    if (side == 4)
+        win->map->player.angle = 0; 
+}
+void mlx_draw(t_mlx *win)
+{
+    // int x_3d;
+    // int y_3d;
+    // int xpixel;
+    // int ypixel;
+    // int num_rays;
+    // int camera_x;
+    // int ray_dir_x;
+    // int ray_angle;
+    int direction = check_whichside(win, win->map->player.x, win->map->player.y);
+    set_the_vision_angle(win, direction);
+    // x_3d = win->map->player.x * 64;
+    // y_3d = win->map->player.y * 64;
+    // win->map->player.fov = 60 *( M_PI / 180);
+    // num_rays = WIDTH / 1;
+    // camera_x = win->map->player.fov / 2;
+    // ray_angle = win->map->player.fov / WIDTH;
+    // xpixel = 0;
    
-}
-void mlx_draw_rect(mlx_image_t *img, int x, int y, int color)
-{
-    int i;
-    int j;
-
-    i = 0;
-    color = 0x00FFFFF;
-    while (i < HEIGHT)
-    {
-        j = 0;
-        while (j < WIDTH)
-        {
-            mlx_put_pixel(img, x + j, y + i,color );
-            j++;
-        }
-        i++;
-    }
-}
-void init_map_shit(t_mlx *win)
-{
-    win->map->map_height= WIDTH;
-    win->map->map_width = HEIGHT;
 }
 int main(int ac, char **av) 
 {
     int fd;
     atexit(f);
-    t_mlx *window;
-    window = malloc(sizeof(t_mlx));
-    window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
-    window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
-    if(!window->mlx || !window->img)
-    {
-        printf("Error\n");
-        exit(1);
-    }
-    puts("hello segv ");
+    t_mlx *window = NULL;
+    
     if (ac != 2 || check_file(av[1]) == 0) 
     {
         printf("Error\n");
-        exit(1);
+        return (1);
     }
+    window = malloc(sizeof(t_mlx));
+    if(!window)
+        return (1);
     window->map = malloc(sizeof(t_map));
-
+    if(!window->map)
+        return (1);
     init__map(window->map);
     fd = open(av[1], O_RDONLY);
     if (fd == -1) 
     {
         printf("Error opening file\n");
-        ft_free_window(&window);
         return 1;
     }
     if (parsing_map(window->map, fd, av[1]))
     {
-        puts("ss");
         printf("Error\n");
         ft_free_window(&window);
         return (1);
 
     }
-    draw_walls2d(window,0,0,0x00FF);
-    // init_map_shit(window);
-    // mlx_draw_rect(window->img, window->map->player.x, window->map->player.y, 0x00FF0000);
-    // printf("%s\n", map->no);
-    // printf("%s\n", map->so);
-    // printf("%s\n", map->we);
-    // printf("%s\n", map->ea);
-    // printf("%d\n", map->floor.r);
-    // printf("%d\n", map->floor.g);
-    // printf("%d\n", map->floor.b);
-    // printf("%d\n", map->ceiling.r);
-    // printf("%d\n", map->ceiling.g);
-    // printf("%d\n", map->ceiling.b);
+    // printf("%s\n", window->map->no);
+    // printf("%s\n", window->map->so);
+    // printf("%s\n", window->map->we);
+    // printf("%s\n", window->map->ea);
+    // printf("%d\n", window->map->floor.r);
+    // printf("%d\n", window->map->floor.g);
+    // printf("%d\n", window->map->floor.b);
+    // printf("%d\n", window->map->ceiling.r);
+    // printf("%d\n", window->map->ceiling.g);
+    // printf("%d\n", window->map->ceiling.b);
+    // int i = 0;
+    // while (window->map->map[i] != NULL)
+    // {
+    //     printf("%s\n", window->map->map[i]);
+    //     i++;
+    // }
+    window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
+    window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
+    mlx_draw(window);
     mlx_image_to_window(window->mlx, window->img, 0, 0);
-    mlx_loop_hook(window->mlx,&hook_stuff,window);
     mlx_loop(window->mlx);
+    mlx_loop_hook(window->mlx, &hook_stuff, window);
     ft_free_window(&window);
     close(fd);
     return 0;
