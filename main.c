@@ -61,22 +61,17 @@ int parsing_coma(char *line)
 
 int parsing_floor_ceiling(char **line)
 {
-    int i;
+    int i = 0;
     int j ;
-    char *p;
-
-    i = 0;
     while (line[i] != NULL)
     {
         j = 0;
-        p = ft_strtrim(line[i], "' ' '\t' '\n' '\v' '\f' '\r'");
-        while(p[j] != '\0')
+        while(line[i][j] != '\0')
         {
-            if(!is_digit(p[j]))
-                return (free(p), 1);
+            if(!is_digit(line[i][j]))
+                return (1);
             j++;
         }
-        free(p);
         i++;
     }
     if(i != 3)
@@ -729,6 +724,10 @@ void init__map(t_map *map)
     map->ceiling.g = 0;
     map->ceiling.b = 0;
 }
+double radians_to_degrees(double radians) {
+    return radians * (180.0 / M_PI);
+}
+
 void ft_free_window(t_mlx **window)
 {
     ft_free_map(&(*window)->map);
@@ -743,38 +742,85 @@ void hook_stuff(void *params)
     // if(mlx_is_key_down())
 
 }
-void mlx_draw_rect(mlx_image_t *img, int x, int y, int color)
+int check_whichside(t_mlx *win, int x, int y)
 {
-    int i;
-    int j;
-
-    i = 0;
-    color = 0x00FFFFF;
-    while (i < HEIGHT)
-    {
-        j = 0;
-        while (j < WIDTH)
-        {
-            mlx_put_pixel(img, x + j, y + i,color );
-            j++;
-        }
-        i++;
-    }
+    if (win->map->map[y][x] == 'N')
+        return (1);
+    if (win->map->map[y][x] == 'S')
+        return (2);
+    if (win->map->map[y][x] == 'W')
+        return (3);
+    if (win->map->map[y][x] == 'E')
+        return (4);
+    return (0);
 }
-  
+void set_the_vision_angle(t_mlx *win, int side)
+{
+    if (side == 1)
+        win->map->player.angle = 3 * M_PI / 2;
+    if (side == 2)
+        win->map->player.angle = M_PI / 2;
+    if (side == 3)
+        win->map->player.angle = M_PI;
+    if (side == 4)
+        win->map->player.angle = 0; 
+}
+// double ray_casting(t_mlx *win, double ray_angle)
+// {
+
+// }
+   
+void mlx_draw(t_mlx *win)
+{
+//    double x_3d;
+//     double y_3d;
+//     // int xpixel;
+//     // int ypixel;
+//     int num_rays;
+//     double camera_x;
+//     // int ray_dir_x;
+//     // int ray_angle;
+//     int direction = check_whichside(win, win->map->player.x, win->map->player.y);
+//     set_the_vision_angle(win, direction);
+//     x_3d = win->map->player.x * 64;
+//     y_3d = win->map->player.y * 64;
+//     win->map->player.fov = 60 *( M_PI / 180);
+//     num_rays = WIDTH ;
+//     camera_x = win->map->player.fov / 2;
+//     // ray_angle = win->map->player.fov / WIDTH;
+//     // xpixel = 0;
+        win->map->player.fov = 60 * ( M_PI / 180);
+        int xpixel =0;
+        double ray_step = win->map->player.fov / WIDTH;
+        double ray_angle = win->map->player.angle - (win->map->player.fov / 2);
+        // double ray_distance;
+
+        while(xpixel < WIDTH)
+        {
+            // ray_distance  = ray_casting(win, ray_angle); 
+            ray_angle += ray_step;
+            xpixel++;
+        }
+
+   
+}
 int main(int ac, char **av) 
 {
     int fd;
     atexit(f);
-    t_mlx *window = NULL;
+    t_mlx *window = malloc(sizeof(t_mlx));
     
     if (ac != 2 || check_file(av[1]) == 0) 
     {
         printf("Error\n");
         return (1);
     }
+    window = malloc(sizeof(t_mlx));
+    if(!window)
+        return (1);
     window->map = malloc(sizeof(t_map));
-
+    if(!window->map)
+        return (1);
     init__map(window->map);
     fd = open(av[1], O_RDONLY);
     if (fd == -1) 
@@ -782,14 +828,6 @@ int main(int ac, char **av)
         printf("Error opening file\n");
         return 1;
     }
-    window = malloc(sizeof(t_mlx));
-    // mlx_draw_rect(window->img, 100, 100, 0x00FFFFF0);
-    // mlx_image_to_window(window->mlx, window->img, 0, 0);
-    // window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
-    // window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
-    window->map = malloc(sizeof(t_map));
-
-    init__map(window->map);
     if (parsing_map(window->map, fd, av[1]))
     {
         printf("Error\n");
@@ -797,17 +835,26 @@ int main(int ac, char **av)
         return (1);
 
     }
-    // mlx_draw_rect(window->img, window->map->player.x, window->map->player.y, 0x00FF0000);
-    // printf("%s\n", map->no);
-    // printf("%s\n", map->so);
-    // printf("%s\n", map->we);
-    // printf("%s\n", map->ea);
-    // printf("%d\n", map->floor.r);
-    // printf("%d\n", map->floor.g);
-    // printf("%d\n", map->floor.b);
-    // printf("%d\n", map->ceiling.r);
-    // printf("%d\n", map->ceiling.g);
-    // printf("%d\n", map->ceiling.b);
+    // printf("%s\n", window->map->no);
+    // printf("%s\n", window->map->so);
+    // printf("%s\n", window->map->we);
+    // printf("%s\n", window->map->ea);
+    // printf("%d\n", window->map->floor.r);
+    // printf("%d\n", window->map->floor.g);
+    // printf("%d\n", window->map->floor.b);
+    // printf("%d\n", window->map->ceiling.r);
+    // printf("%d\n", window->map->ceiling.g);
+    // printf("%d\n", window->map->ceiling.b);
+    // int i = 0;
+    // while (window->map->map[i] != NULL)
+    // {
+    //     printf("%s\n", window->map->map[i]);
+    //     i++;
+    // }
+    window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
+    window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
+    mlx_draw(window);
+    mlx_image_to_window(window->mlx, window->img, 0, 0);
     mlx_loop(window->mlx);
     mlx_loop_hook(window->mlx, &hook_stuff, window);
     ft_free_window(&window);

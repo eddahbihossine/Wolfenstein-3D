@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+         #
+#    By: heddahbi <heddahbi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/05 02:44:37 by abel-hid          #+#    #+#              #
-#    Updated: 2023/11/22 18:53:55 by abel-hid         ###   ########.fr        #
+#    Updated: 2023/11/25 22:59:12 by heddahbi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,12 +22,12 @@ OBJS = $(SRCS:.c=.o)
 
 CC = cc
 RM = rm -f
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra 
 
 all: $(NAME)
 
 $(NAME):$(OBJS)
-	$(CC) $(OBJS) MLX42/build/libmlx42.a -Iinclude -lglfw -L"/Users/$(USER)/.brew/opt/glfw/lib/" -o $(NAME) 
+	$(CC) $(OBJS) MLX42/build/libmlx42.a -Iinclude -lglfw -L"/Users/$(USER)/.brew/opt/glfw/lib/"  -fsanitize=address -g -o $(NAME) 
 %.o: %.c cub3D.h
 	$(CC) $(CFLAGS) -Imlx -c $< -o $@
 
