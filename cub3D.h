@@ -6,7 +6,7 @@
 /*   By: heddahbi <heddahbi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/11/25 03:14:15 by heddahbi         ###   ########.fr       */
+/*   Updated: 2023/11/26 08:39:49 by heddahbi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,14 @@
 #include "./MLX42/include/MLX42/MLX42.h"
 # include <string.h>
 #define ESC 256
+#define W 87
+#define S 83
+#define A 65
+#define D 68
+#define LEFT 263
+#define RIGHT 262
+#define DOWN 264
+#define UP 265
 #define WIDTH 800
 #define HEIGHT 800
 #ifndef BUFFER_SIZE

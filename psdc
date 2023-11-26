@@ -1,61 +1,64 @@
-// Define constants
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-FOV = 60 // Field of View in degrees
-MAP_WIDTH = ...
-MAP_HEIGHT = ...
-TILE_SIZE = ...
+void moveForward(struct Player *player, double speed) {
+    player->x += speed * cos(player->angle);
+    player->y += speed * sin(player->angle);
+}
 
-// Player's initial position and direction
-player_x = ...
-player_y = ...
-player_angle = ...
+// Function to move the player backward
+void moveBackward(struct Player *player, double speed) {
+    player->x -= speed * cos(player->angle);
+    player->y -= speed * sin(player->angle);
+}
 
-// Map data (1 represents a wall, 0 represents an empty space)
-map = [...]
+// Function to strafe the player left
+void strafeLeft(struct Player *player, double speed) {
+    player->x -= speed * cos(player->angle + M_PI / 2);
+    player->y -= speed * sin(player->angle + M_PI / 2);
+}
 
-// Raycasting loop
-for (column = 0; column < SCREEN_WIDTH; column++) {
-    // Calculate the angle of the current ray
-    ray_angle = player_angle - (FOV / 2) + (column / SCREEN_WIDTH) * FOV
+// Function to strafe the player right
+void strafeRight(struct Player *player, double speed) {
+    player->x += speed * cos(player->angle + M_PI / 2);
+    player->y += speed * sin(player->angle + M_PI / 2);
+}
 
-    // Initialize ray parameters
-    ray_x = player_x
-    ray_y = player_y
-    delta_x = cos(ray_angle)
-    delta_y = sin(ray_angle)
-
-    // Perform the DDA (Digital Differential Analyzer) algorithm
-    hit_wall = false
-    while (!hit_wall) {
-        // Move the ray to the next grid position
-        ray_x += delta_x
-        ray_y += delta_y
-
-        // Check if the ray hit a wall
-        map_x = floor(ray_x / TILE_SIZE)
-        map_y = floor(ray_y / TILE_SIZE)
-        if (map[map_x][map_y] == 1) {
-            hit_wall = true
-        }
+// Update function to handle player movement based on user input
+void updatePlayer(struct Player *player) {
+    // Check for user input (e.g., arrow keys) and update player position accordingly
+    // Example: If the up arrow key is pressed, move the player forward
+    if (upArrowKeyPressed) {
+        moveForward(player, movementSpeed);
     }
-    float distance_to_wall = sqrt(pow(ray_x - player_x, 2) + pow(ray_y - player_y, 2));
+    // Example: If the down arrow key is pressed, move the player backward
+    if (downArrowKeyPressed) {
+        moveBackward(player, movementSpeed);
+    }
+    // Example: If the left arrow key is pressed, strafe the player left
+    if (leftArrowKeyPressed) {
+        strafeLeft(player, movementSpeed);
+    }
+    // Example: If the right arrow key is pressed, strafe the player right
+    if (rightArrowKeyPressed) {
+        strafeRight(player, movementSpeed);
+    }
 
-        // Calculate wall height based on distance and player's distance to the projection plane
-        int wall_height = (int)(SCREEN_HEIGHT / distance_to_wall);
+    // Additional logic for other user input (e.g., rotation) can be added here
+}
 
-        // Calculate the position and height of the wall slice on the screen
-        int wall_top = fmax(0, (SCREEN_HEIGHT - wall_height) / 2);
-        int wall_bottom = fmin(SCREEN_HEIGHT, wall_top + wall_height);
+// Main game loop
+while (gameIsRunning) {
+    // Update player position based on user input
+    updatePlayer(&player);
 
-    // Calculate distance to the wall (perpendicular distance)
-    // You may use the Pythagorean theorem or another distance formula
+    // Recalculate rays and perform raycasting
+    // ...
 
-    // Calculate wall height based on distance and player's distance to the projection plane
+    // Render the scene
+    // ...
 
-    // Calculate the position and height of the wall slice on the screen
+    // Handle other game logic and events
+    // ...
 
-    // Render the wall slice on the screen
+    // Repeat the loop
 }
 
 // Display the rendered image
