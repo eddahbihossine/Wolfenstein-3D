@@ -772,37 +772,49 @@ void set_the_vision_angle(t_mlx *win, int side)
    
 void mlx_draw(t_mlx *win)
 {
-//    double x_3d;
-//     double y_3d;
-//     // int xpixel;
-//     // int ypixel;
-//     int num_rays;
-//     double camera_x;
-//     // int ray_dir_x;
-//     // int ray_angle;
-//     int direction = check_whichside(win, win->map->player.x, win->map->player.y);
-//     set_the_vision_angle(win, direction);
-//     x_3d = win->map->player.x * 64;
-//     y_3d = win->map->player.y * 64;
-//     win->map->player.fov = 60 *( M_PI / 180);
-//     num_rays = WIDTH ;
-//     camera_x = win->map->player.fov / 2;
-//     // ray_angle = win->map->player.fov / WIDTH;
-//     // xpixel = 0;
-        win->map->player.fov = 60 * ( M_PI / 180);
-        int xpixel =0;
-        double ray_step = win->map->player.fov / WIDTH;
-        double ray_angle = win->map->player.angle - (win->map->player.fov / 2);
+    // double map_width = win->map->map_width;
+    // double map_height = win->map->map_height;
+    win->map->player.fov = 60 * ( M_PI / 180); // this is in radian 
+    int direction = check_whichside(win, win->map->player.x, win->map->player.y);
+    set_the_vision_angle(win, direction);
+    int xpixel =0;
+    double ray_step = win->map->player.fov / WIDTH;
         // double ray_distance;
 
         while(xpixel < WIDTH)
         {
-            // ray_distance  = ray_casting(win, ray_angle); 
+        double ray_angle = win->map->player.angle - (win->map->player.fov / 2) + (xpixel / WIDTH) * win->map->player.fov;
+        double ray_x = win->map->player.x;
+        double ray_y = win->map->player.y;
+        double delta_x = cos(ray_angle);
+        double delta_y = sin(ray_angle);
+
+        bool wall_hit = false;
+        while(!wall_hit)
+        {
+            ray_x += delta_x;
+            ray_y += delta_y;
+
+            double map_x = floor(ray_x);
+            double map_y = floor(ray_y);
+            if(win->map->map[(int)map_y][(int)map_x] == '1')
+                wall_hit = true;
+
+        }
+        float distance_to_wall = sqrt(pow(ray_x - win->map->player.x, 2) + pow(ray_y - win->map->player.y, 2));
+        // Calculate wall height based on distance and player's distance to the projection plane
+        int wall_height = (int)(HEIGHT / distance_to_wall);
+        // Calculate the position and height of the wall slice on the screen
+        int wall_top = fmax(0, (HEIGHT - wall_height) / 2);
+        int wall_bottom = fmin(HEIGHT, wall_top + wall_height);
+
+        for (int y = wall_top; y < wall_bottom; y++) {
+           mlx_put_pixel(win->img, xpixel, y, 0xFF);
+        }
             ray_angle += ray_step;
             xpixel++;
         }
 
-   
 }
 int main(int ac, char **av) 
 {
@@ -833,7 +845,6 @@ int main(int ac, char **av)
         printf("Error\n");
         ft_free_window(&window);
         return (1);
-
     }
     // printf("%s\n", window->map->no);
     // printf("%s\n", window->map->so);
