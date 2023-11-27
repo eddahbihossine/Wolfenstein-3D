@@ -1,64 +1,49 @@
-void moveForward(struct Player *player, double speed) {
-    player->x += speed * cos(player->angle);
-    player->y += speed * sin(player->angle);
-}
+# Constants
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+PLAYER_POSITION = (200, 200)
+PLAYER_ANGLE = 0
+FOV = 60
+NUM_RAYS = SCREEN_WIDTH
+DIST_PROJECTION_PLANE = (SCREEN_WIDTH / 2) / tan(radians(FOV / 2))
 
-// Function to move the player backward
-void moveBackward(struct Player *player, double speed) {
-    player->x -= speed * cos(player->angle);
-    player->y -= speed * sin(player->angle);
-}
+# Map
+world_map = [
+    "1111111111111111111111111",
+    "1000000000110000000000001",
+    "1011000001110000000000001",
+    "1001000000000000000000001",
+    "1111111111111111111111111"
+]
 
-// Function to strafe the player left
-void strafeLeft(struct Player *player, double speed) {
-    player->x -= speed * cos(player->angle + M_PI / 2);
-    player->y -= speed * sin(player->angle + M_PI / 2);
-}
+# Raycasting function
+def cast_rays():
+    for ray in range(NUM_RAYS):
+        # Calculate ray angle
+        ray_angle = PLAYER_ANGLE - (FOV / 2) + (ray / NUM_RAYS) * FOV
 
-// Function to strafe the player right
-void strafeRight(struct Player *player, double speed) {
-    player->x += speed * cos(player->angle + M_PI / 2);
-    player->y += speed * sin(player->angle + M_PI / 2);
-}
+        # Ray direction
+        ray_direction = (cos(radians(ray_angle)), sin(radians(ray_angle)))
 
-// Update function to handle player movement based on user input
-void updatePlayer(struct Player *player) {
-    // Check for user input (e.g., arrow keys) and update player position accordingly
-    // Example: If the up arrow key is pressed, move the player forward
-    if (upArrowKeyPressed) {
-        moveForward(player, movementSpeed);
-    }
-    // Example: If the down arrow key is pressed, move the player backward
-    if (downArrowKeyPressed) {
-        moveBackward(player, movementSpeed);
-    }
-    // Example: If the left arrow key is pressed, strafe the player left
-    if (leftArrowKeyPressed) {
-        strafeLeft(player, movementSpeed);
-    }
-    // Example: If the right arrow key is pressed, strafe the player right
-    if (rightArrowKeyPressed) {
-        strafeRight(player, movementSpeed);
-    }
+        # Find distance to the wall
+        distance_to_wall, hit_wall = cast_single_ray(PLAYER_POSITION, ray_direction)
 
-    // Additional logic for other user input (e.g., rotation) can be added here
-}
+        # Calculate wall height
+        wall_height = min(int(DIST_PROJECTION_PLANE / distance_to_wall), SCREEN_HEIGHT)
 
-// Main game loop
-while (gameIsRunning) {
-    // Update player position based on user input
-    updatePlayer(&player);
+        # Draw the wall slice
+        draw_wall(ray, wall_height, hit_wall)
 
-    // Recalculate rays and perform raycasting
-    // ...
+# Ray-casting function for a single ray
+def cast_single_ray(start, direction):
+    # Implement the ray-casting algorithm here
+    # Check for intersections with walls and calculate distance
+    # Return distance to wall and the type of wall hit
 
-    // Render the scene
-    // ...
+# Draw a wall slice on the screen
+def draw_wall(ray, wall_height, hit_wall):
+    # Use the hit_wall information to determine the texture or color
+    # Draw a vertical line on the screen at the position 'ray' with height 'wall_height'
 
-    // Handle other game logic and events
-    // ...
-
-    // Repeat the loop
-}
-
-// Display the rendered image
+# Example usage
+cast_rays()
