@@ -801,9 +801,9 @@ int check_whichside(t_mlx *win)
 void set_the_vision_angle(t_mlx *win, int side)
 {
     if (side == 1)
-        win->map->player.angle =  M_PI / 2;
+        win->map->player.angle =  3 *M_PI / 2;
     if (side == 2)
-        win->map->player.angle = 3 * M_PI / 2;
+        win->map->player.angle =  M_PI / 2;
     if (side == 3)
         win->map->player.angle = M_PI;
     if (side == 4)
@@ -816,49 +816,94 @@ void set_the_vision_angle(t_mlx *win, int side)
    
 void init_params(t_mlx *win)
 {
-  win->map->player = (t_player){.x = 0, .y = 0, .fov = 60 , .number_rays = WIDTH};
+  win->map->player = (t_player){ .fov = degrees_to_radians(60) , .number_rays = WIDTH};
   set_the_vision_angle(win, check_whichside(win));
   
 }
-
-double get_the_distance(t_mlx *win, double ray_angle)
+int check_intersection(t_mlx *win, int x, int y)
 {
-    int inter_x;
-    int inter_y;
-    double x_to_check;
-    double y_to_check;
+    if(win->map->map[y][x] == '1')
+        return (1);
+    return (0);
+}
 
-    inter_x = (int)win->map->player.x;
-    inter_y = (int)win->map->player.y;
-    x_to_check = win->map->player.x;
-    y_to_check = win->map->player.y;
-    printf("%f\n", ray_angle);
-    while (win->map->map[inter_y][inter_x] != '1')
+
+double horizget_the_distance(t_mlx *win, double ray_angle)
+{
+    double y_intercept;
+    double x_intercept;
+    double x_step;
+    double y_step;
+
+
+    y_intercept = floor(win->map->player.y /64) *64;
+    x_intercept = win->map->player.x +tan(ray_angle) * (y_intercept - win->map->player.y);
+    y_step = 64;
+    x_step = 64 * tan(ray_angle);
+    if (ray_angle > M_PI)
+        y_step *= -1;
+    if(ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2)
+        x_step *= -1;
+    while (check_intersection(win, x_intercept, y_intercept) == 0)
     {
-        x_to_check += cos(ray_angle);
-        y_to_check += sin(ray_angle);
-        inter_x = (int)x_to_check;
-        inter_y = (int)y_to_check;
+        x_intercept += x_step;
+        y_intercept += y_step;
     }
-    return (sqrt(pow(win->map->player.x - x_to_check, 2) + pow(win->map->player.y - y_to_check, 2)));
+    return (sqrt(pow(win->map->player.x - x_intercept, 2) + pow(win->map->player.y - y_intercept, 2)));
+}
+
+double vertget_the_distance(t_mlx *win, double ray_angle)
+{
+    double y_intercept;
+    double x_intercept;
+    double x_step;
+    double y_step;
+
+
+    x_intercept = floor(win->map->player.x /64) *64;
+    y_intercept = win->map->player.y + (x_intercept - win->map->player.x) / tan(ray_angle);
+    x_step = 64;
+    y_step = 64 * tan(ray_angle);
+    if (ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2)
+        x_step *= -1;
+    if(ray_angle > 0 && ray_angle < M_PI)
+        y_step *= -1;
+    while (check_intersection(win, x_intercept, y_intercept) == 0)
+    {
+        x_intercept += x_step;
+        y_intercept += y_step;
+    }
+    return (sqrt(pow(win->map->player.x - x_intercept, 2) + pow(win->map->player.y - y_intercept, 2)));
 }
 // void draw_shit(t_mlx *win ,int ray_distance)
 // {
 
 // }
+
+double compare_distance(double a , double b)
+{
+    if(a < b )
+        return(a);
+        
+    return(b);
+    
+}
 void raycast(t_mlx *win)
 {
     int i =0;
-    double ray_angle;
-    // double ray_distance = 0;
+    double ray_angle =  win->map->player.angle - (degrees_to_radians(60)/2);
+    double horizray_distance = 0;
+    double verray_distance;
     double ray_step;
+    ray_step = win->map->player.fov / WIDTH;
 
     while(i < WIDTH)
     {
-        ray_step = win->map->player.angle / WIDTH;
-        ray_angle = win->map->player.angle - (win->map->player.fov / 2) + (i / win->map->player.number_rays) * win->map->player.fov;
-        printf("%f\n",radians_to_degrees(ray_angle));
-        // ray_distance = get_the_distance(win, ray_angle);
+        horizray_distance = horizget_the_distance(win, ray_angle);
+        verray_distance = vertget_the_distance(win, ray_angle);
+        win->ray[i].ray_angle = ray_angle;
+        win->ray[i].ray_distance = compare_distance(horizray_distance,verray_distance);
+        // norm_angle();
         ray_angle += ray_step;
         i++;
     }

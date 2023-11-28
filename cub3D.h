@@ -6,7 +6,7 @@
 /*   By: heddahbi <heddahbi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/11/27 01:20:22 by heddahbi         ###   ########.fr       */
+/*   Updated: 2023/11/28 06:05:23 by heddahbi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,14 @@
 #ifndef BUFFER_SIZE
 # define BUFFER_SIZE 42
 #endif
+
+typedef struct s_ray
+{
+   double ray_angle;
+    double ray_distance;
+   
+} t_ray;
+
 typedef struct	s_player
 {
     double x;
@@ -71,6 +79,7 @@ typedef struct s_mlx
     mlx_t    *mlx;
     mlx_image_t *img;
     t_map *map;
+    t_ray ray[WIDTH];
     
 } t_mlx;
 
