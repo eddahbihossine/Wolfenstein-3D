@@ -801,7 +801,7 @@ int check_whichside(t_mlx *win)
 void set_the_vision_angle(t_mlx *win, int side)
 {
     if (side == 1)
-        win->map->player.angle =  3 *M_PI / 2;
+        win->map->player.angle =  3 * M_PI / 2;
     if (side == 2)
         win->map->player.angle =  M_PI / 2;
     if (side == 3)
@@ -822,11 +822,11 @@ void init_params(t_mlx *win)
 }
 int check_intersection(t_mlx *win, int x, int y)
 {
-    if(win->map->map[y][x] == '1')
-        return (1);
-    return (0);
-}
+    if (x < 0 || y < 0 || y >= win->map->map_height || x >= win->map->map_width)
+        return 1;  // Out of bounds
 
+    return (win->map->map[y][x] == '1');
+}
 
 double horizget_the_distance(t_mlx *win, double ray_angle)
 {
@@ -835,9 +835,8 @@ double horizget_the_distance(t_mlx *win, double ray_angle)
     double x_step;
     double y_step;
 
-
     y_intercept = floor(win->map->player.y /64) *64;
-    x_intercept = win->map->player.x +tan(ray_angle) * (y_intercept - win->map->player.y);
+    x_intercept = win->map->player.x + tan(ray_angle) * (y_intercept - win->map->player.y);
     y_step = 64;
     x_step = 64 * tan(ray_angle);
     if (ray_angle > M_PI)
@@ -859,7 +858,6 @@ double vertget_the_distance(t_mlx *win, double ray_angle)
     double x_step;
     double y_step;
 
-
     x_intercept = floor(win->map->player.x /64) *64;
     y_intercept = win->map->player.y + (x_intercept - win->map->player.x) / tan(ray_angle);
     x_step = 64;
@@ -868,17 +866,13 @@ double vertget_the_distance(t_mlx *win, double ray_angle)
         x_step *= -1;
     if(ray_angle > 0 && ray_angle < M_PI)
         y_step *= -1;
-    while (check_intersection(win, x_intercept, y_intercept) == 0)
+    while (check_intersection(win, (int)x_intercept, (int)y_intercept) == 0)
     {
         x_intercept += x_step;
         y_intercept += y_step;
     }
     return (sqrt(pow(win->map->player.x - x_intercept, 2) + pow(win->map->player.y - y_intercept, 2)));
 }
-// void draw_shit(t_mlx *win ,int ray_distance)
-// {
-
-// }
 
 double compare_distance(double a , double b)
 {
@@ -887,6 +881,28 @@ double compare_distance(double a , double b)
         
     return(b);
     
+}
+
+void draw_walls(t_mlx *win)
+{
+    for (int i = 0; i < WIDTH; i++)
+    {
+        double distance_proj_plane = (WIDTH / 2) / tan(win->map->player.fov / 2);
+        double wall_strip_height = (64 / win->ray[i].ray_distance) * distance_proj_plane;
+        double wall_top_pixel = (HEIGHT / 2) - (wall_strip_height / 2);
+        double wall_bottom_pixel = (HEIGHT / 2) + (wall_strip_height / 2);
+
+        int j = 0;
+        while (j < HEIGHT)
+        {
+            if (j < wall_top_pixel || j > wall_bottom_pixel)
+                mlx_put_pixel(win->img, i, j, 0x000000); // Background color
+            else
+                mlx_put_pixel(win->img, i, j, 0xFFFF0); // Wall color
+
+            j++;
+        }
+    }
 }
 void raycast(t_mlx *win)
 {
@@ -903,10 +919,14 @@ void raycast(t_mlx *win)
         verray_distance = vertget_the_distance(win, ray_angle);
         win->ray[i].ray_angle = ray_angle;
         win->ray[i].ray_distance = compare_distance(horizray_distance,verray_distance);
-        // norm_angle();
         ray_angle += ray_step;
         i++;
     }
+    draw_walls(win);
+    
+
+
+    
 }
 
 int main(int ac, char **av) 
