@@ -6,7 +6,7 @@
 /*   By: heddahbi <heddahbi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/11/28 06:05:23 by heddahbi         ###   ########.fr       */
+/*   Updated: 2023/11/30 15:09:01 by heddahbi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ typedef struct	s_map
     char     *ea;
     t_color  floor;
     t_color  ceiling;
-    t_player player;
+    t_player *player;
 }				t_map;
 
 typedef struct s_mlx
