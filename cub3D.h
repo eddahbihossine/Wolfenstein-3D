@@ -6,7 +6,7 @@
 /*   By: heddahbi <heddahbi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/01 11:05:00 by heddahbi         ###   ########.fr       */
+/*   Updated: 2023/12/02 10:40:53 by heddahbi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,8 @@
 typedef struct s_ray
 {
    double ray_angle;
-    double ray_distance;
+   double ray_distance;
+    int was_hit_vertical;
    
 } t_ray;
 
@@ -80,6 +81,7 @@ typedef struct s_mlx
     mlx_image_t *img;
     t_map *map;
     t_ray ray[WIDTH];
+
     
 } t_mlx;
 
