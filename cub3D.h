@@ -6,7 +6,7 @@
 /*   By: heddahbi <heddahbi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/02 10:40:53 by heddahbi         ###   ########.fr       */
+/*   Updated: 2023/12/04 17:57:25 by heddahbi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <math.h>
+# include <stdbool.h>
 #include "./MLX42/include/MLX42/MLX42.h"
 # include <string.h>
 #define ESC 256
@@ -41,7 +42,14 @@ typedef struct s_ray
 {
    double ray_angle;
    double ray_distance;
-    int was_hit_vertical;
+   double wall_hit_x;
+   double wall_hit_y;
+   int was_hit_vertical;
+   int is_ray_facing_up;
+   int is_ray_facing_down;
+   int is_ray_facing_left;
+   int is_ray_facing_right;
+    int wall_hit_content;
    
 } t_ray;
 
@@ -52,6 +60,7 @@ typedef struct	s_player
     double fov;
     double angle;
     double number_rays;
+   
 }				t_player;
 
 typedef struct  s_color
