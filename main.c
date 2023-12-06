@@ -678,8 +678,8 @@ int get_player_position(t_map *map)
             if (map->map[i][j] == 'N' || map->map[i][j] == 'S' || map->map[i][j] == 'W' || map->map[i][j] == 'E')
             {
                 // x and y are the coordinates of the player
-                map->player->x = j * 64 + 32;
-                map->player->y = i * 64 + 32;
+                map->player->x = j * (64) +32;
+                map->player->y = i * (64) +32;
                 printf("player.y = %f\n", map->player->y);
                 return (0);
             }
@@ -926,68 +926,107 @@ void normalsize_angle(double *angle)
     if (*angle < 0)
         *angle += 2.0 * M_PI;
 }
-double vertget_the_distance(t_mlx *win, double ray_angle)
+int check_the_ray(t_mlx *mlx, double ray_angle)
 {
-    double x_intercept;
-    double y_intercept;
-    double x_step;
-    double y_step;
-
-    normalsize_angle(&ray_angle);
-
-    x_intercept = floor(win->map->player->x / 64) * 64;
-    y_intercept = win->map->player->y + (x_intercept - win->map->player->x) * tan(ray_angle);
-
-    if (check_leftorrigh(ray_angle))
-        x_intercept += 64;
-
-    x_step = 64;
-    if (check_leftorrigh(ray_angle))
-        x_step *= -1;
-
-    y_step = 64 * tan(ray_angle);
-    if ((ray_angle < 0.5 * M_PI || ray_angle > 1.5 * M_PI) && y_step > 0)
-        y_step *= -1;
-    if ((ray_angle > 0.5 * M_PI && ray_angle < 1.5 * M_PI) && y_step < 0)
-        y_step *= -1;
-    double next_vert_x = x_intercept;
-    double next_vert_y = y_intercept;
-    while (check_intersection(win, next_vert_x, next_vert_y, ray_angle) == 0 && next_vert_x >= 0 && next_vert_y >= 0)
-    {
-        next_vert_x += x_step;
-        next_vert_y += y_step;
-    }
-    return sqrt(pow(win->map->player->x -next_vert_x, 2) + pow(win->map->player->y - next_vert_y, 2));
+    if(ray_angle > 2 * M_PI)
+        ray_angle -= 2 * M_PI;
+    if(ray_angle < 0)
+        ray_angle += 2 * M_PI;
+    mlx->map->player->angle = ray_angle;
+    return (0);
 }
+#define TILE_SIZE 64
 
-double horizget_the_distance(t_mlx *win, double ray_angle)
+double distance_between_points(double x1, double y1, double x2, double y2)
 {
-    double x_intercept;
-    double y_intercept;
-    double x_step;
-    double y_step;
+    return (sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)));
+}
+double raycastinghorizontal(t_mlx *mlx, double ray_angle)
+{
+    double xintercept;
+    double yintercept;
+    double xstep;
+    double ystep;
+    double distance_to_horz_wall;
+    double tanray;
 
-    y_intercept = floor(win->map->player->y / 64) * 64;
-    x_intercept = win->map->player->x + (y_intercept - win->map->player->y) / tan(ray_angle);
-    if (check_downorup(ray_angle))
-        y_intercept += 64;
-    y_step = 64;
-    if (check_downorup(ray_angle))
-        y_step *= -1;
-    x_step = 64 / tan(ray_angle);
-    if ((ray_angle < M_PI && ray_angle > 2 * M_PI) && x_step > 0)
-        x_step *= -1;
-    if (ray_angle > M_PI && ray_angle < 2 * M_PI && x_step < 0)
-        x_step *= -1;
-    double next_horiz_x = x_intercept;
-    double next_horiz_y = y_intercept;
-    while (check_intersection(win, next_horiz_x, next_horiz_y, ray_angle) == 0 && next_horiz_x >= 0 && next_horiz_y >= 0)
+    tanray = tan(ray_angle);
+    yintercept = floor(mlx->map->player->y / TILE_SIZE) * TILE_SIZE;
+    if(tanray > 0)
+        yintercept += TILE_SIZE;
+    if(tanray < 0)
+        yintercept -= 1;
+    xintercept = mlx->map->player->x + (yintercept - mlx->map->player->y) / tanray;
+    ystep = TILE_SIZE;
+    if(tanray > 0)
+        ystep *= -1;
+    xstep = TILE_SIZE / tanray;
+    if(tanray < 0 && xstep > 0)
+        xstep *= -1;
+    if(tanray > 0 && xstep < 0)
+        xstep *= -1;
+    while(xintercept >= 0 && xintercept <= mlx->map->map_width * TILE_SIZE && yintercept >= 0 && yintercept <= mlx->map->map_height * TILE_SIZE)
     {
-        next_horiz_x += x_step;
-        next_horiz_y += y_step;
-    }
+        if(check_the_ray(mlx, ray_angle))
+            return (1);
+        if(mlx->map->map[(int)(yintercept / TILE_SIZE)][(int)(xintercept / TILE_SIZE)] == '1')
+        {
+            distance_to_horz_wall = distance_between_points(mlx->map->player->x, mlx->map->player->y, xintercept, yintercept);
+            
+            mlx->ray[0].wall_hit_x = xintercept;
+            mlx->ray[0].wall_hit_y = yintercept;
+            mlx->ray[0].was_hit_vertical = 0;
+           return(distance_to_horz_wall);
+        }
 
-    return sqrt(pow(win->map->player->x - next_horiz_x, 2) + pow(win->map->player->y - next_horiz_y, 2));
+        xintercept += xstep;
+        yintercept += ystep;
+    }
+    return (0);
+}
+#define TILE_SIZE 64
+
+double raycastingvertical(t_mlx *mlx, double ray_angle)
+{
+    double xintercept;
+    double yintercept;
+    double xstep;
+    double ystep;
+    double distance_to_vert_wall;
+    double tanray;
+
+    tanray = tan(ray_angle);
+
+    xintercept = floor(mlx->map->player->x / TILE_SIZE) * TILE_SIZE;
+    if(tanray < 0)
+        xintercept -= 1;
+    if(tanray > 0)
+        xintercept += TILE_SIZE;
+    yintercept = mlx->map->player->y + (xintercept - mlx->map->player->x) * tanray;
+    xstep = TILE_SIZE;
+    if(tanray < 0)
+        xstep *= -1;
+    ystep = TILE_SIZE * tanray;
+    if(tanray > 0 && ystep < 0)
+        ystep *= -1;
+    if(tanray < 0 && ystep > 0)
+        ystep *= -1;
+    while(xintercept >= 0 && xintercept <= mlx->map->map_width * TILE_SIZE && yintercept >= 0 && yintercept <= mlx->map->map_height * TILE_SIZE)
+    {
+        if(check_the_ray(mlx, ray_angle))
+            return (1);
+        if(mlx->map->map[(int)(yintercept / TILE_SIZE)][(int)(xintercept / TILE_SIZE)] == '1')
+        {
+            distance_to_vert_wall = distance_between_points(mlx->map->player->x, mlx->map->player->y, xintercept, yintercept);
+            mlx->ray[0].wall_hit_x = xintercept;
+            mlx->ray[0].wall_hit_y = yintercept;
+            mlx->ray[0].was_hit_vertical = 1;
+            return(distance_to_vert_wall);
+        }
+        xintercept += xstep;
+        yintercept += ystep;
+    }
+    return (0);
 }
 
 
@@ -1009,6 +1048,7 @@ void render_3d(t_mlx *win)
     for(int i = 0; i <win->map->player->number_rays; i++)
     {
         t_ray ray = win->ray[i];
+
         double distance = ray.ray_distance;
         double distance_projection_plane = (WIDTH / 2) / tan(win->map->player->fov / 2);
         double wall_strip_height = (64 / distance) * distance_projection_plane;
@@ -1017,6 +1057,7 @@ void render_3d(t_mlx *win)
         wall_top_pixel = wall_top_pixel < 0 ? 0 : wall_top_pixel;
         int wall_bottom_pixel = (HEIGHT / 2) + (wall_strip_height / 2);
         wall_bottom_pixel = wall_bottom_pixel > HEIGHT ? HEIGHT : wall_bottom_pixel;
+
         int color = 0;
         if(ray.was_hit_vertical)
             color = 0x00BADA55;
@@ -1043,11 +1084,12 @@ void raycast(t_mlx *win)
 
     while(i < WIDTH)
     {
+        horizray_distance = raycastinghorizontal(win, ray_angle);
+        verray_distance = raycastingvertical(win,ray_angle);
         normalsize_angle(&ray_angle);
         win->ray[i].ray_angle = ray_angle;
-        horizray_distance = horizget_the_distance(win, ray_angle);
-        verray_distance = vertget_the_distance(win,ray_angle);
         win->ray[i].ray_distance = compare_distance(horizray_distance,verray_distance,win,i);
+        // getchar();
         ray_angle += ray_step;
         i++;
     }
