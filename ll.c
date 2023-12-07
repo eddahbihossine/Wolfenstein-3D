@@ -61,17 +61,22 @@ int parsing_coma(char *line)
 
 int parsing_floor_ceiling(char **line)
 {
-    int i = 0;
+    int i;
     int j ;
+    char *p;
+
+    i = 0;
     while (line[i] != NULL)
     {
         j = 0;
-        while(line[i][j] != '\0')
+        p = ft_strtrim(line[i], "' ' '\t' '\n' '\v' '\f' '\r'");
+        while(p[j] != '\0')
         {
-            if(!is_digit(line[i][j]))
-                return (1);
+            if(!is_digit(p[j]))
+                return (free(p), 1);
             j++;
         }
+        free(p);
         i++;
     }
     if(i != 3)
@@ -636,7 +641,7 @@ int back_wall(char *line)
     free(wall);
     return (0);
 }
-void raycast(t_mlx *win);
+
 int wall_check(t_map *map) 
 {
     int i;
@@ -678,9 +683,16 @@ int get_player_position(t_map *map)
             if (map->map[i][j] == 'N' || map->map[i][j] == 'S' || map->map[i][j] == 'W' || map->map[i][j] == 'E')
             {
                 // x and y are the coordinates of the player
-                map->player->x = j* 64 + 32 ;
-                map->player->y = i  *64 +32;
-  
+                map->player->x = j;
+                map->player->y = i;
+                if(map->map[i][j] == 'N')
+                    map->player->angle = 3 * M_PI / 2;
+                if(map->map[i][j] == 'S')
+                    map->player->angle = M_PI / 2;
+                if(map->map[i][j] == 'W')
+                    map->player->angle = M_PI;
+                if(map->map[i][j] == 'E')
+                    map->player->angle = 0;
                 return (0);
             }
             j++;
@@ -725,345 +737,174 @@ void init__map(t_map *map)
     map->ceiling.g = 0;
     map->ceiling.b = 0;
 }
-double radians_to_degrees(double radians) {
-    return radians * (180.0 / M_PI);
-}
 
 void ft_free_window(t_mlx **window)
 {
     ft_free_map(&(*window)->map);
     free((*window));
 }
-double degrees_to_radians(double degrees) {
-    return degrees * (M_PI / 180);
-}
-// void print_stuff()
-void mlx_draw(t_mlx *win);
-
-int check_wall_collision(t_mlx *win, double xx, double yy)
+double rayfacing_up(double angle)
 {
-    int x;
-    int y;
-
-    x = floor(xx / 64);
-    y = floor(yy / 64);
-    return (win->map->map[y][x] == '1');
+    return (angle > 0 && angle < M_PI);
 }
-void MoveForward(t_mlx *mlx, double speed)
-{
-    // if (check_wall_collision(mlx, cos(mlx->map->player->angle) * speed, sin(mlx->map->player->angle) * speed))
-    //     return ;
-    mlx->map->player->x += cos(mlx->map->player->angle) * speed;
-    mlx->map->player->y += sin(mlx->map->player->angle) * speed;
-}
-
-void MoveBackward(t_mlx *mlx, double speed)
-{
-    mlx->map->player->x -= cos(mlx->map->player->angle) * speed;
-    mlx->map->player->y -= sin(mlx->map->player->angle) * speed;
-}
-
-void MoveLeft(t_mlx *mlx, double speed)
-{
-    mlx->map->player->x += cos(mlx->map->player->angle - M_PI_2) * speed;
-    mlx->map->player->y += sin(mlx->map->player->angle - M_PI_2) * speed;
-}
-
-void MoveRight(t_mlx *mlx, double speed)
-{
-    mlx->map->player->x += cos(mlx->map->player->angle + M_PI_2) * speed;
-    mlx->map->player->y += sin(mlx->map->player->angle + M_PI_2) * speed;
-}
-void render_3d(t_mlx *win);
-void hook_stuff(void *params)
-{
-    t_mlx *win = (t_mlx *)params;
-
-
-    mlx_delete_image(win->mlx, win->img);
-    if (mlx_is_key_down(win->mlx, ESC))
-        exit(0);
-    if (mlx_is_key_down(win->mlx, W))
-        MoveForward(win, 5);
-    // else if (mlx_is_key_down(win->mlx, S))
-    //     MoveBackward(win, 5);
-    // else if (mlx_is_key_down(win->mlx, A))
-    //     MoveLeft(win, 5);
-    // else if (mlx_is_key_down(win->mlx, D))
-    //     MoveRight(win, 5);
-    else if (mlx_is_key_down(win->mlx, LEFT))
-        win->map->player->angle -= 0.1;
-    else if (mlx_is_key_down(win->mlx, RIGHT))
-        win->map->player->angle += 0.1;
-    win->img = mlx_new_image(win->mlx, WIDTH, HEIGHT);
-    raycast(win);
-    render_3d(win);
-    mlx_image_to_window(win->mlx, win->img, 0, 0);
-
-}
-
-int check_whichside(t_mlx *win)
-{
-    int i = 0;
-    int j = 0;
-    while (win->map->map[i] != NULL)
-    {
-        j = 0;
-        while (win->map->map[i][j] != '\0')
-        {
-            if (win->map->map[i][j] == 'N')
-                return (1);
-            if (win->map->map[i][j] == 'S')
-                return (2);
-            if (win->map->map[i][j] == 'W')
-                return (3);
-            if (win->map->map[i][j] == 'E')
-                return (4);
-            j++;
-        }
-        i++;
-    }
-    return (0);
-}
-void set_the_vision_angle(t_mlx *win, int side)
-{
-    if (side == 1)
-        win->map->player->angle =  3 * M_PI / 2;
-    else if (side == 2)
-        win->map->player->angle =  M_PI / 2;
-    else if (side == 3)
-        win->map->player->angle =  M_PI;
-    else if (side == 4)
-        win->map->player->angle =  0;
-}  
-void init_params(t_mlx *win)
-{
-    win->map->player->fov = degrees_to_radians(60);
-    win->map->player->number_rays = WIDTH;
-    set_the_vision_angle(win, check_whichside(win));
-}
-int	xray_direction(double ray_angle)
-{
-	return (fabs(cos(ray_angle)) / cos(ray_angle));
-}
-
-int	yray_direction(double ray_angle)
-{
-	return (fabs(sin(ray_angle)) / sin(ray_angle));
-}
-int check_intersection(t_mlx *win, int x, int y)
-{   
-       int        i;
-        int        j;
-
-        if (x < 0 || x > win->map->map_width  || y < 0
-                || y > win->map->map_height)
-                return (1);
-        i = floor(y);
-        j = floor(x);
-        if (i >= win->map->map_height || j >= win->map->map_width )
-                return (1);
-        return (win->map->map[i][j] == '1');
-
-}
-int check_upordown(double ray_angle)
-{
-    if (ray_angle > 0 && ray_angle < M_PI)
-        return (1);
-    return (0);
-}
-int check_leftorrigh( double ray_angle)
-{
-    if (ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2)
-        return (1);
-    return (0);
-}
-
-
-
-
-
-
 int	has_wall(t_mlx *win, double x, double y)
 {
 	int	i;
 	int	j;
 
-	if (x < 0 || y < 0 || x > win->map->map_width * 64 || y > win->map->map_height * 64)
-        return (1); 
-    i = floor(y / 64);
-    j = floor(x / 64);
-    if (i >= win->map->map_height || j >= win->map->map_width)
-        return (1);
-    return (win->map->map[i][j] == '1');
-}
-// 	int	i;
-// 	int	j;
-
-// 	if (x < 0 ||  y < 0)
-// 		return (1);
-// 	i = floor(y / 64);
-// 	j = floor(x / 64);
-// 	if (i >= 800 || j >= 800)
-// 		return (1);
-// 	return (win->map->map[i][j] == '1');
-// }
-
-double horizget_the_distance(t_mlx *win, double ray_angle)
-{
-	double	xintercept;
-	double	yintercept;
-	yintercept = floor(win->map->player->y / 64)
-		* 64;
-	if (ray_angle > 0 && ray_angle < M_PI)
-		yintercept += 64;
-	xintercept = win->map->player->x + ((yintercept - win->map->player->y)
-			/ tan(ray_angle));
-	double	xstep;
-	double	ystep;
-
-	ystep = 64;
-	if (ray_angle > M_PI)
-		ystep *= -1;
-	xstep = 64 / tan(ray_angle);
-	if (ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2 && xstep > 0)
-		xstep *= -1;
-	if ((ray_angle < M_PI / 2 || ray_angle > 3 * M_PI  / 2) && xstep < 0)
-		xstep *= -1;
-	if (ray_angle > M_PI)
-		yintercept -= 0.1;
-
-	while (!has_wall(win, xintercept, yintercept))
-	{
-		xintercept += xstep;
-		yintercept += ystep;
-	}
-    return (sqrt(pow(win->map->player->x - xintercept, 2) + pow(win->map->player->y - yintercept, 2)));
+	if (x < 0 || x > win->map->map_width * 64 || y < 0
+		|| y > win->map->map_height * 64)
+		return (1);
+	i = floor(y / 64);
+	j = floor(x / 64);
+	if (i >= win->map->map_height || j >= win->map->map_width )
+		return (1);
+	return (win->map->map[i][j] == '1');
 }
 
-double vertget_the_distance(t_mlx *win, double ray_angle)
+double distance_between_points(double x1, double y1, double x2, double y2)
 {
-	double	xintercept;
-	double	yintercept;
-
-	xintercept = floor(win->map->player->x / 64)
-		* 64;
-	if (ray_angle > 3 * M_PI / 2 || ray_angle < M_PI / 2)
-		xintercept += 64;
-	yintercept = win->map->player->y + ((xintercept - win->map->player->x)
-			* tan(ray_angle));
-	double	xstep;
-	double	ystep;
-	xstep = 64;
-	if (ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2)
-		xstep *= -1;
-	ystep = 64 * tan(ray_angle);
-	if (ray_angle > M_PI && ystep > 0)
-	    ystep *= -1;
-	if (ray_angle < M_PI && ystep < 0)
-		ystep *= -1;
-	if (ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2)
-		xintercept -= 0.1;
-	while (!has_wall(win, xintercept, yintercept))
-	{
-		xintercept += xstep;
-		yintercept += ystep;
-	}
-    return (sqrt(pow(win->map->player->x - xintercept, 2) + pow(win->map->player->y - yintercept, 2)));
+    return (sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)));
 }
 
-// double horizget_the_distance(t_mlx *win, double ray_angle)
-// {
-//     double x_intercept;
-//     double y_intercept;
-//     double x_step;
-//     double y_step;
-
-//     y_intercept = (floor(win->map->player->y / 64) * 64);
-//     if (check_upordown(ray_angle))
-//         y_intercept += 64;
-//     else
-//         y_intercept -= 1;
-//     x_intercept = win->map->player->x + (fabs(win->map->player->y - y_intercept) / tanf(ray_angle));
-//     y_step = 64;
-//     if (ray_angle > M_PI && ray_angle < 2 * M_PI )
-//         y_step *= -1;
-//     x_step = 64 / tan(ray_angle);
-//     if (ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2 && x_step > 0)
-//         x_step *= -1;
-//     if ((ray_angle < M_PI / 2 || ray_angle > 3 * M_PI / 2) && x_step < 0)
-//         x_step *= -1;
-//     while (check_intersection(win, x_intercept /64, y_intercept /64) == 0)
-//     {
-//         x_intercept += x_step;
-//         y_intercept += y_step;
-//     }
-//     return (sqrt(pow(win->map->player->x - x_intercept, 2) + pow(win->map->player->y - y_intercept, 2)));
-// }
-
-// double vertget_the_distance(t_mlx *win, double ray_angle)
-// {
-//     double x_intercept;
-//     double y_intercept;
-//     double x_step;
-//     double y_step;
-
-//     x_intercept = (floor(win->map->player->x / 64) * 64);
-//     if (check_leftorrigh(ray_angle))
-//         x_intercept += 64;
-//     else
-//         x_intercept -= 1;
- 
-//     y_intercept = win->map->player->y + (fabs(win->map->player->x - x_intercept) * tanf(ray_angle));
-//     x_step = 64;
-//     if (ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2)
-//         x_step *= -1;
-//     y_step = 64 * tan(ray_angle);
-//     if ((ray_angle < M_PI / 2 || ray_angle > 3 * M_PI / 2) && y_step < 0)
-//         y_step *= -1;
-//     if ((ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2) && y_step > 0)
-//         y_step *= -1;
-//     while (check_intersection(win, x_intercept / 64, y_intercept / 64) == 0)
-//     {
-//         x_intercept += x_step;
-//         y_intercept += y_step;
-//     }
-//     return (sqrt(pow(win->map->player->x - x_intercept, 2) + pow(win->map->player->y - y_intercept, 2)));
-// }
-
-
-double compare_distance(double a , double b, t_mlx *win ,int i)
+double horizontal_intersect(t_mlx *win, int i)
 {
-    win->ray[i].was_hit_vertical = 0;
-    if(a > b)
+    double xintercept;
+    double yintercept;
+
+    yintercept = floor(win->map->player->y / 64) * 64;
+    if (win->ray[i].is_ray_facing_down)
+        yintercept += 64;
+    xintercept = win->map->player->x + (yintercept - win->map->player->y) / tan(win->ray[i].ray_angle);
+    double ystep = 64;
+    if (win->ray[i].is_ray_facing_up)
+        ystep *= -1;
+    double xstep = 64 / tan(win->ray[i].ray_angle);
+    if (win->ray[i].is_ray_facing_left && xstep > 0)
+        xstep *= -1;
+    if (win->ray[i].is_ray_facing_right && xstep < 0)
+        xstep *= -1;
+    double next_horz_touch_x = xintercept;
+    double next_horz_touch_y = yintercept;
+    if(win->ray[i].is_ray_facing_up)
+        next_horz_touch_y--;
+    while (1)
     {
-        win->ray[i].was_hit_vertical = 1;
-        return (b);
+        if (has_wall(win, next_horz_touch_x, next_horz_touch_y))
+            return (distance_between_points(win->map->player->x, win->map->player->y, next_horz_touch_x, next_horz_touch_y));
+        else
+        {
+            next_horz_touch_x += xstep;
+            next_horz_touch_y += ystep;
+        }
     }
-    return (a);
-    
+    return (0); 
 }
 
-void render_3d(t_mlx *win)
+double vertical_intersect(t_mlx *win, int i)
+{
+    double xintercept;
+    double yintercept;
+
+    xintercept = floor(win->map->player->x / 64) * 64;
+    if (win->ray[i].is_ray_facing_right)
+        xintercept += 64;
+    yintercept = win->map->player->y + (xintercept - win->map->player->x) * tan(win->ray[i].ray_angle);
+    double xstep = 64;
+    if (win->ray[i].is_ray_facing_left)
+        xstep *= -1;
+    double ystep = 64 * tan(win->ray[i].ray_angle);
+    if (win->ray[i].is_ray_facing_up && ystep > 0)
+        ystep *= -1;
+    if (win->ray[i].is_ray_facing_down && ystep < 0)
+        ystep *= -1;
+    double next_vert_touch_x = xintercept;
+    double next_vert_touch_y = yintercept;
+    if(win->ray[i].is_ray_facing_left)
+        next_vert_touch_x--;
+    while (1)
+    {
+        if (has_wall(win, next_vert_touch_x, next_vert_touch_y))
+            return (distance_between_points(win->map->player->x, win->map->player->y, next_vert_touch_x, next_vert_touch_y));
+        else
+        {
+            next_vert_touch_x += xstep;
+            next_vert_touch_y += ystep;
+        }
+    }
+    return (0); 
+}
+
+
+
+double rayfacing_left(double angle)
+{
+    return (angle > M_PI / 2 && angle < 3 * M_PI / 2);
+}
+
+void normalize_angle(t_ray *angle)
+{
+   angle->ray_angle = remainder(angle->ray_angle, 2 * M_PI);
+    if(angle->ray_angle < 0)
+          angle->ray_angle = (2 * M_PI) + angle->ray_angle;
+
+    if(angle->ray_angle > M_PI)
+        angle->is_ray_facing_up = 1;
+    if(angle->ray_angle > M_PI /2 && angle->ray_angle < 3 * M_PI / 2)
+        angle->is_ray_facing_left = 1;
+
+    angle->is_ray_facing_right = !angle->is_ray_facing_left;
+    angle->is_ray_facing_down = !angle->is_ray_facing_up;
+}
+
+
+
+void raycast(t_mlx *win)
+{
+    int i =0;
+    double ray_angle;
+    ray_angle = win->map->player->angle - (win->map->player->fov / 2);
+    double distance_to_wallh;
+    double distance_to_wallv;
+
+    while(i < 1471)
+    {
+        win->ray[i].ray_angle = ray_angle;
+        printf("ray_angle = %f\n", win->ray[i].ray_angle);
+        normalize_angle(&win->ray[i]);
+        distance_to_wallh = horizontal_intersect(win,win->ray[i].ray_angle);
+        distance_to_wallv = vertical_intersect(win,win->ray[i].ray_angle);
+        win->ray[i].ray_distance = distance_to_wallh;
+        if(distance_to_wallh < distance_to_wallv)
+        {
+            win->ray[i].ray_distance = distance_to_wallh;
+        }
+        else
+        {
+            win->ray[i].ray_distance = distance_to_wallv;
+        }
+        ray_angle += win->map->player->fov / 1472;
+        i++;
+    }   
+}
+
+
+
+void render(t_mlx *win)
 {
 
 	double	correct_distance;
 	double	projection_distance;
 	int		i;
-	int		**texture;
+
 
 	projection_distance = (WIDTH / 2)
 		/ tan((60 * (M_PI / 180)) / 2);
 	i = -1;
-	while (++i < 800)
+	while (++i < WIDTH)
 	{
-		correct_distance = win->ray[i].ray_distance
-			* cos(win->map->player->angle - win->ray[i].ray_angle);
-		 double wall_strip_heightt = 
-			projection_distance * 64
-			/ correct_distance;
-
-
+		correct_distance = win->ray[i].ray_distance * cos(win->map->player->angle - win->ray[i].ray_angle);
+		 double wall_strip_heightt = (projection_distance * 64) / correct_distance;
 	int	y;
 	int	y1;
 
@@ -1075,83 +916,156 @@ void render_3d(t_mlx *win)
 			mlx_put_pixel(win->img, i, y, 0x00000000);
 		else if (y < y1 + wall_strip_heightt)
 			mlx_put_pixel(win->img, i, y, 0xFFFFFFFF);
-		// else
-		// 	mlx_put_pixel(win->img, i, y, 0x00000000);
+		else
+			mlx_put_pixel(win->img, i, y, 0x00000000);
 	}
 	}
 }
 
-void normalize_angle(double *angle)
+int check_wall_collision(t_mlx *win, double x, double y)
 {
-    *angle = remainder(*angle, 2 * M_PI);
-    if (*angle < 0)
-        *angle = (2 * M_PI) + *angle;
+    int i;
+    int j;
+    i = floor(y / 64);
+    j = floor(x / 64);
+    if(i < 0 || i >= win->map->map_height || j < 0 || j >= win->map->map_width)
+        return (1);
+    return (win->map->map[i][j] == '1');    
+}
+int    player_movement(t_mlx *win)
+{
+    int	move_step;
+	int	x;
+	int	y;
+
+	win->map->player->angle += win->turn_direction * 3.0 * (M_PI / 180);
+	move_step = 2.0 * win->side_direction;
+	if (check_wall_collision(win, win->map->player->x + cos(win->map->player->angle) * \
+		move_step, win->map->player->y + sin(win->map->player->angle) * move_step))
+		return (0);
+	win->map->player->x += cos(win->map->player->angle) * move_step;
+	win->map->player->y += sin(win->map->player->angle) * move_step;
+	return (1);
+}
+void start_shit(t_mlx *win)
+{
+    if(!player_movement(win))
+        return ;
+    raycast(win);
+    render(win);
+}
+void	key_w(t_mlx *player, mlx_key_data_t keydata)
+{
+	if (keydata.action == MLX_PRESS)
+		player->side_direction = 1;
+	else if (keydata.action == MLX_RELEASE)
+		player->side_direction = 0;
 }
 
-void raycast(t_mlx *win)
+void	key_right(t_mlx *player, mlx_key_data_t keydata)
 {
-    int i =0;
-    double ray_angle =  win->map->player->angle - ((60 * (M_PI / 180)) / 2);
-    double horizray_distance;
-    double verray_distance;
-    double ray_step;
-    ray_step = (60 * (M_PI / 180)) / WIDTH;
-    while(i < WIDTH)
-    {
-        win->ray[i].ray_angle = fmod(ray_angle, 2 * M_PI);
-        if(win->ray[i].ray_angle < 0)
-            win->ray[i].ray_angle = (2 * M_PI) + win->ray[i].ray_angle;
-        horizray_distance = horizget_the_distance(win, win->ray[i].ray_angle);
-        verray_distance = vertget_the_distance(win,win->ray[i].ray_angle);
-        win->ray[i].ray_distance = compare_distance(horizray_distance,verray_distance,win,i);
-        ray_angle += ray_step;
-        i++;
-    }
- 
+	if (keydata.action == MLX_PRESS)
+		player->turn_direction = 1;
+	else if (keydata.action == MLX_RELEASE)
+		player->turn_direction = 0;
 }
 
+void	key_left(t_mlx *player, mlx_key_data_t keydata)
+{
+	if (keydata.action == MLX_PRESS)
+		player->turn_direction = -1;
+	else if (keydata.action == MLX_RELEASE)
+		player->turn_direction = 0;
+}
+
+
+
+void	key_func(mlx_key_data_t keydata, void *param)
+{
+	t_mlx	*player;
+
+	player = param;
+	if (keydata.key == MLX_KEY_W)
+		key_w(player, keydata);
+	// if (keydata.key == MLX_KEY_S)
+	// 	key_s(player, keydata);
+	if (keydata.key == MLX_KEY_LEFT)
+		key_left(player, keydata);
+	if (keydata.key == MLX_KEY_RIGHT)
+		key_right(player, keydata);
+	// if (keydata.key == MLX_KEY_A)
+	// 	key_a(player, keydata);
+	// if (keydata.key == MLX_KEY_D)
+	// 	key_d(player, keydata);
+	if (keydata.key == MLX_KEY_ESCAPE)
+		exit (0);
+}
+// void print_stuff()
+void hook_stuff(void *params)
+{
+   t_mlx *window = (t_mlx *)params;
+   if(window->img)
+        mlx_delete_image(window->mlx, window->img);
+    window->img = mlx_new_image(window->mlx,WIDTH,HEIGHT);
+    start_shit(window);
+    mlx_image_to_window(window->mlx,window->img,0,0);
+
+
+}
+void init_params(t_mlx *window)
+{
+    window->turn_direction = 0;
+    window->side_direction = 0;
+    window->map->player->fov = 60 * (M_PI / 180);
+    window->map->player->x = window->map->player->x * TILE_SIZE + TILE_SIZE / 2;
+    window->map->player->y = window->map->player->y * TILE_SIZE + TILE_SIZE / 2;
+    window->map->player->turn_direction = 0;
+    window->map->player->walk_direction = 0;
+}
+
+  
 int main(int ac, char **av) 
 {
     int fd;
-    t_mlx *window = malloc(sizeof(t_mlx));
+    t_mlx window;
     
     if (ac != 2 || check_file(av[1]) == 0) 
     {
         printf("Error\n");
         return (1);
     }
-    if(!window)
-        return (1);
-    window->map = malloc(sizeof(t_map));
-    window->map->player = malloc(sizeof(t_player));
-    if(!window->map)
-        return (1);
-    init__map(window->map);
+
     fd = open(av[1], O_RDONLY);
     if (fd == -1) 
     {
         printf("Error opening file\n");
         return 1;
     }
-    if (parsing_map(window->map, fd, av[1]))
+    window.map = malloc(sizeof(t_map));
+    window.map->player = malloc(sizeof(t_player));
+    window.ray = malloc(sizeof(t_ray) * WIDTH +1);
+    init__map(window.map);
+    if (parsing_map(window.map, fd, av[1]))
     {
         printf("Error\n");
-        ft_free_window(&window);
+
         return (1);
+
     }
-    // printf("%s\n", window->map->no);
-    // printf("%s\n", window->map->so);
-    // printf("%s\n", window->map->we);
-    window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
-    window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
-    init_params(window);
-    raycast(window);
-    render_3d(window);
-    // mlx_draw(window);
-    mlx_image_to_window(window->mlx, window->img, 0, 0);
-    mlx_loop_hook(window->mlx, hook_stuff, window);
-    mlx_loop(window->mlx);
-    ft_free_window(&window);
+    init_params(&window);
+
+   window.mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
+   window.img = mlx_new_image(window.mlx, WIDTH, HEIGHT);
+   printf("%d\n", window.map->map_height);
+    printf("%d\n", window.map->map_width);
+    printf("%f\n", window.map->player->x);
+    printf("%f\n", window.map->player->y);
+    printf("%f\n", window.map->player->angle);
+    mlx_key_hook(window.mlx, &key_func, &window);
+    mlx_loop_hook(window.mlx, &hook_stuff, &window);
+   mlx_image_to_window(window.mlx, window.img, 0, 0);
+    mlx_loop(window.mlx);
+
     close(fd);
     return 0;
 } 
