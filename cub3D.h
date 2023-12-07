@@ -6,7 +6,7 @@
 /*   By: heddahbi <heddahbi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/04 17:57:25 by heddahbi         ###   ########.fr       */
+/*   Updated: 2023/12/07 16:32:46 by heddahbi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,7 @@ typedef struct s_mlx
     mlx_image_t *img;
     t_map *map;
     t_ray ray[WIDTH];
+    mlx_texture_t *texture;
 
     
 } t_mlx;
