@@ -794,25 +794,25 @@ void hook_stuff(void *params)
         if (mlx_is_key_down(win->mlx, ESC))
             exit(0);
         if (mlx_is_key_down(win->mlx, W))
-            MoveForward(win, 5);
+            MoveForward(win, 2);
         else if (mlx_is_key_down(win->mlx, S))
-            MoveBackward(win, 5);
+            MoveBackward(win, 2);
         else if (mlx_is_key_down(win->mlx, A))
-            MoveLeft(win, 5);
+            MoveLeft(win, 2);
         else if (mlx_is_key_down(win->mlx, D))
-            MoveRight(win, 5);
+            MoveRight(win, 2);
         else if (mlx_is_key_down(win->mlx, LEFT))
-            win->map->player->angle -= 0.01;
+            win->map->player->angle -= 0.009;
         else if (mlx_is_key_down(win->mlx, RIGHT))
-            win->map->player->angle += 0.01;
+            win->map->player->angle += 0.009;
         else if(mlx_is_mouse_down(win->mlx,0))
-            win->map->player->angle += 0.01;
+            win->map->player->angle += 0.009;
         else if(mlx_is_mouse_down(win->mlx,1))
-            win->map->player->angle -= 0.01;
+            win->map->player->angle -= 0.009;
         win->img = mlx_new_image(win->mlx, WIDTH, HEIGHT);
         raycast(win);
         render_3d(win);
-        mlx_image_to_window(win->mlx, win->img, 0, 0);
+   
     
 
 }
@@ -1058,13 +1058,14 @@ void render_3d(t_mlx *win)
 	while (++y < HEIGHT)
 	{
 		if (y < y1)
-			mlx_put_pixel(win->img, i, y, 0x00000000);
+			mlx_put_pixel(win->img, i, y, 0xFFDDDD);
 		else if (y < y1 + wall_strip_heightt)
 			mlx_put_pixel(win->img, i, y, color);
 		else
-			mlx_put_pixel(win->img, i, y, 0x00000000);
+			mlx_put_pixel(win->img, i, y, 0xDEADA55);
 	}
     }
+    mlx_image_to_window(win->mlx, win->img, 0, 0);
 }
 
 double normalize_angle(double *angle)
