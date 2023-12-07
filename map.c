@@ -6,10 +6,11 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/07 19:31:40 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/07 19:31:59 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/07 19:34:14 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "cub3D.h"
 
 int check_file(char *file)
 {
