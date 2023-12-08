@@ -956,6 +956,8 @@ double horizget_the_distance(t_mlx *win, double ray_angle)
     return (sqrt(pow(win->map->player->x - xintercept, 2) + pow(win->map->player->y - yintercept, 2)));
 }
 
+
+
 double vertget_the_distance(t_mlx *win, double ray_angle)
 {
 	double	xintercept;
@@ -1001,13 +1003,39 @@ double compare_distance(double a , double b, t_mlx *win ,int i)
     
 }
 
+void    texture_thewall(t_mlx *win, mlx_texture_t *texture)
+{
+    (void)win;
+    (void)texture;
+    // printf("texture north : %s\n", win->map->no);
+    // printf("texture south : %s\n", win->map->so);
+
+    // printf("texture west : %s\n", win->map->we);
+
+}
+uint8_t *  convert_to_rgb(uint8_t *pixels)
+{
+    int i = 0;
+    int len = ft_strlen((char *)pixels);
+    uint8_t *rgb = malloc(sizeof(uint8_t) * len);
+    while(i < len)
+    {
+        rgb[i] = pixels[i];
+        i++;
+    }
+    return (rgb);
+}
 void render_3d(t_mlx *win)
 {
 
 	double	correct_distance;
 	double	projection_distance;
 	int		i;
-	// int		**texture;
+
+    if(!win->texture)
+        win->texture = malloc(sizeof(mlx_texture_t));
+        win->texture = mlx_load_png("textures/1.png");
+	
 
 	projection_distance = (WIDTH / 2)
 		/ tan((60 * (M_PI / 180)) / 2);
@@ -1021,38 +1049,20 @@ void render_3d(t_mlx *win)
 			/ correct_distance;
 	int	y;
 	int	y1;
-    int color = 0;
+    uint8_t *color;
+    
 
-    // char *texture_path;
-    // int textnum = win->map->map[(int)floor(win->map->player->y / 64)][(int)floor(win->map->player->x / 64)] - '0';
-    // win->texture = mlx_load_png("./textures/1.png");
+    // load_texture(win);
+
+    // color = get_color(win, 0, 0);
     // if(win->ray[i].was_hit_vertical)
-    // {
-    //     if(check_upordown(win->ray[i].ray_angle))
-    //         win->texture = mlx_load_png("./textures/2.png");
-    //     else
-    //         win->texture = mlx_load_png("./textures/3.png");
-    // }
+    //     color = get_color(win, 0, 0);
     // else
-    // {
-    //     if(check_leftorrigh(win->ray[i].ray_angle))
-    //         win->texture = mlx_load_png("./textures/4.png");
-    //     else
-    //         win->texture = mlx_load_png("./textures/5.png");
-    // }
+    //     color = get_color(win, 0, 0);
 
-    // texture_path = ft_strjoin("./textures/", itoa(textnum));
-    // texture_path = ft_strjoin(texture_path, ".png");
-    // win->texture = mlx_load_png(texture_path);
-    // free(texture_path);
+    
 
-   
-
-    color = 0xDEAAAD;
-    if(win->ray[i].was_hit_vertical)
-        color = 0xDEAAAD;
-    else
-        color = 0xFF;
+    color = convert_to_rgb(win->texture->pixels);
 	y1 = (HEIGHT / 2) - (wall_strip_heightt / 2);
 	y = -1;
 	while (++y < HEIGHT)
@@ -1060,9 +1070,9 @@ void render_3d(t_mlx *win)
 		if (y < y1)
 			mlx_put_pixel(win->img, i, y, 0xFFDDDD);
 		else if (y < y1 + wall_strip_heightt)
-			mlx_put_pixel(win->img, i, y, color);
+			mlx_put_pixel(win->img, i, y, color[i % 4]);
 		else
-			mlx_put_pixel(win->img, i, y, 0xDEADA55);
+			mlx_put_pixel(win->img, i, y, 0x0000FF >> 12);
 	}
     }
     mlx_image_to_window(win->mlx, win->img, 0, 0);
@@ -1128,11 +1138,6 @@ int main(int ac, char **av)
     }
     window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
     window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
-
-    printf("texture north : %s\n", window->map->no);
-    printf("texture south : %s\n", window->map->so);
-    printf("texture west : %s\n", window->map->we);
-    printf("texture east : %s\n", window->map->ea);
     init_params(window);
     raycast(window);
     render_3d(window);
