@@ -1025,6 +1025,11 @@ uint8_t *  convert_to_rgb(uint8_t *pixels)
     }
     return (rgb);
 }
+size_t get_color(int r, int g, int b, int a)
+{   
+    return ((r & 255) << 24) + ((g & 255) << 16) + ((b & 255) << 8)
+           + (a & 255);
+}
 void render_3d(t_mlx *win)
 {
 
@@ -1033,8 +1038,13 @@ void render_3d(t_mlx *win)
 	int		i;
 
     if(!win->texture)
+    {
         win->texture = malloc(sizeof(mlx_texture_t));
         win->texture = mlx_load_png("textures/1.png");
+    }
+
+        
+    
 	
 
 	projection_distance = (WIDTH / 2)
@@ -1052,27 +1062,39 @@ void render_3d(t_mlx *win)
     uint8_t *color;
     
 
-    // load_texture(win);
-
-    // color = get_color(win, 0, 0);
-    // if(win->ray[i].was_hit_vertical)
-    //     color = get_color(win, 0, 0);
-    // else
-    //     color = get_color(win, 0, 0);
-
     
+    uint8_t **pixels = malloc(sizeof(uint8_t *) * 64);
+    int j = 0;
+    while(j < 64)
+    {
+        pixels[j] = malloc(sizeof(uint8_t) * 4);
+        j++;
+    }
+    j = 0;
+    while(j < 64)
+    {
+        pixels[j][0] = win->texture->pixels[(int)((j * 64 / wall_strip_heightt) * 4)];
+        pixels[j][1] = win->texture->pixels[(int)((j * 64 / wall_strip_heightt) * 4) + 1];
+        pixels[j][2] = win->texture->pixels[(int)((j * 64 / wall_strip_heightt) * 4) + 2];
+        pixels[j][3] = win->texture->pixels[(int)((j * 64 / wall_strip_heightt) * 4) + 3];
+        j++;
+    }
+
+
 
     color = convert_to_rgb(win->texture->pixels);
 	y1 = (HEIGHT / 2) - (wall_strip_heightt / 2);
 	y = -1;
+    size_t floor = get_color( win->map->floor.r, win->map->floor.g, win->map->floor.b , 255);
+    size_t ceiling = get_color( win->map->ceiling.r, win->map->ceiling.g, win->map->ceiling.b, 255);
 	while (++y < HEIGHT)
 	{
 		if (y < y1)
-			mlx_put_pixel(win->img, i, y, 0xFFDDDD);
+			mlx_put_pixel(win->img, i, y, ceiling);
 		else if (y < y1 + wall_strip_heightt)
-			mlx_put_pixel(win->img, i, y, color[i % 4]);
+			mlx_put_pixel(win->img, i, y, get_color(pixels[(int)((y - y1) * 64 / wall_strip_heightt)][0], pixels[(int)((y - y1) * 64 / wall_strip_heightt)][1], pixels[(int)((y - y1) * 64 / wall_strip_heightt)][2], pixels[(int)((y - y1) * 64 / wall_strip_heightt)][3]));
 		else
-			mlx_put_pixel(win->img, i, y, 0x0000FF >> 12);
+			mlx_put_pixel(win->img, i, y, (u_int32_t)floor);
 	}
     }
     mlx_image_to_window(win->mlx, win->img, 0, 0);
