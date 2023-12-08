@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cub3D.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
+/*   By: heddahbi <heddahbi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/11/22 19:22:53 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/07 16:32:46 by heddahbi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,47 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <math.h>
+# include <stdbool.h>
 #include "./MLX42/include/MLX42/MLX42.h"
 # include <string.h>
+#define ESC 256
+#define W 87
+#define S 83
+#define A 65
+#define D 68
+#define LEFT 263
+#define RIGHT 262
+#define DOWN 264
+#define UP 265
 #define WIDTH 800
 #define HEIGHT 800
 #ifndef BUFFER_SIZE
 # define BUFFER_SIZE 42
 #endif
+
+typedef struct s_ray
+{
+   double ray_angle;
+   double ray_distance;
+   double wall_hit_x;
+   double wall_hit_y;
+   int was_hit_vertical;
+   int is_ray_facing_up;
+   int is_ray_facing_down;
+   int is_ray_facing_left;
+   int is_ray_facing_right;
+    int wall_hit_content;
+   
+} t_ray;
+
 typedef struct	s_player
 {
-    int	x;
-    int	y;
+    double x;
+    double y;
+    double fov;
+    double angle;
+    double number_rays;
+   
 }				t_player;
 
 typedef struct  s_color
@@ -51,7 +81,7 @@ typedef struct	s_map
     char     *ea;
     t_color  floor;
     t_color  ceiling;
-    t_player player;
+    t_player *player;
 }				t_map;
 
 typedef struct s_mlx
@@ -59,6 +89,9 @@ typedef struct s_mlx
     mlx_t    *mlx;
     mlx_image_t *img;
     t_map *map;
+    t_ray ray[WIDTH];
+    mlx_texture_t *texture;
+
     
 } t_mlx;
 
