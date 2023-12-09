@@ -924,7 +924,7 @@ int	has_wall(t_mlx *win, double x, double y)
 // 	return (win->map->map[i][j] == '1');
 // }
 
-double horizget_the_distance(t_mlx *win, double ray_angle)
+double horizget_the_distance(t_mlx *win, double ray_angle, int i)
 {
 	double	xintercept;
 	double	yintercept;
@@ -952,13 +952,16 @@ double horizget_the_distance(t_mlx *win, double ray_angle)
 	{
 		xintercept += xstep;
 		yintercept += ystep;
+
 	}
+    win->ray[i].wall_hit_x = xintercept;
+    win->ray[i].wall_hit_y = yintercept;
     return (sqrt(pow(win->map->player->x - xintercept, 2) + pow(win->map->player->y - yintercept, 2)));
 }
 
 
 
-double vertget_the_distance(t_mlx *win, double ray_angle)
+double vertget_the_distance(t_mlx *win, double ray_angle , int i)
 {
 	double	xintercept;
 	double	yintercept;
@@ -983,9 +986,12 @@ double vertget_the_distance(t_mlx *win, double ray_angle)
 		xintercept -= 0.1;
 	while (!has_wall(win, xintercept, yintercept))
 	{
+
 		xintercept += xstep;
 		yintercept += ystep;
 	}
+    win->ray[i].wall_hit_x = xintercept;
+    win->ray[i].wall_hit_y = yintercept;
     return (sqrt(pow(win->map->player->x - xintercept, 2) + pow(win->map->player->y - yintercept, 2)));
 }
 
@@ -1030,12 +1036,16 @@ size_t get_color(int r, int g, int b, int a)
     return ((r & 255) << 24) + ((g & 255) << 16) + ((b & 255) << 8)
            + (a & 255);
 }
+// void texture_thewall(t_mlx *win)
+// {
+
+// }
 void render_3d(t_mlx *win)
 {
 
 	double	correct_distance;
 	double	projection_distance;
-	int		i;
+	int		i = 0;
 
     if(!win->texture)
     {
@@ -1043,6 +1053,8 @@ void render_3d(t_mlx *win)
         win->texture = mlx_load_png("textures/1.png");
     }
 
+
+        
         
     
 	
@@ -1059,40 +1071,43 @@ void render_3d(t_mlx *win)
 			/ correct_distance;
 	int	y;
 	int	y1;
-    uint8_t *color;
     
 
-    
-    uint8_t **pixels = malloc(sizeof(uint8_t *) * 64);
-    int j = 0;
-    while(j < 64)
-    {
-        pixels[j] = malloc(sizeof(uint8_t) * 4);
-        j++;
-    }
-    j = 0;
-    while(j < 64)
-    {
-        pixels[j][0] = win->texture->pixels[(int)((j * 64 / wall_strip_heightt) * 4)];
-        pixels[j][1] = win->texture->pixels[(int)((j * 64 / wall_strip_heightt) * 4) + 1];
-        pixels[j][2] = win->texture->pixels[(int)((j * 64 / wall_strip_heightt) * 4) + 2];
-        pixels[j][3] = win->texture->pixels[(int)((j * 64 / wall_strip_heightt) * 4) + 3];
-        j++;
-    }
 
-
-
-    color = convert_to_rgb(win->texture->pixels);
+    // color = convert_to_rgb(win->texture->pixels);
 	y1 = (HEIGHT / 2) - (wall_strip_heightt / 2);
 	y = -1;
     size_t floor = get_color( win->map->floor.r, win->map->floor.g, win->map->floor.b , 255);
     size_t ceiling = get_color( win->map->ceiling.r, win->map->ceiling.g, win->map->ceiling.b, 255);
+
+    int text_offset_x = 0;
+
+   text_offset_x = (int)win->ray[i].wall_hit_x % 64;
+   if (text_offset_x < 0)
+        text_offset_x = 0;
+//    printf("text_offset_x : %d\n", text_offset_x);
+    double text_offset_y = 64 / wall_strip_heightt;
+    double text_offset_yy = 0;
+    // printf("text_offset_y : %f\n", text_offset_y);
+    int text_offset_ys = text_offset_y;
+
+    // int color = win->texture->pixels[(int)text_offset_y * win->texture->width + text_offset_x];
+
 	while (++y < HEIGHT)
 	{
+
 		if (y < y1)
 			mlx_put_pixel(win->img, i, y, ceiling);
 		else if (y < y1 + wall_strip_heightt)
-			mlx_put_pixel(win->img, i, y, get_color(pixels[(int)((y - y1) * 64 / wall_strip_heightt)][0], pixels[(int)((y - y1) * 64 / wall_strip_heightt)][1], pixels[(int)((y - y1) * 64 / wall_strip_heightt)][2], pixels[(int)((y - y1) * 64 / wall_strip_heightt)][3]));
+        {
+            int color = win->texture->pixels[(int)text_offset_ys * win->texture->width + text_offset_x];
+            text_offset_yy += text_offset_y;
+            text_offset_ys = (int)text_offset_yy;
+            // printf("text_offset_ys : %d\n", text_offset_ys);
+            // getchar();
+            mlx_put_pixel(win->img, i, y, color);
+        }
+    
 		else
 			mlx_put_pixel(win->img, i, y, (u_int32_t)floor);
 	}
@@ -1120,8 +1135,8 @@ void raycast(t_mlx *win)
     while(i < WIDTH)
     {
         win->ray[i].ray_angle = normalize_angle(&ray_angle);
-        horizray_distance = horizget_the_distance(win, win->ray[i].ray_angle);
-        verray_distance = vertget_the_distance(win,win->ray[i].ray_angle);
+        horizray_distance = horizget_the_distance(win, win->ray[i].ray_angle, i);
+        verray_distance = vertget_the_distance(win,win->ray[i].ray_angle,  i);
         win->ray[i].ray_distance = compare_distance(horizray_distance,verray_distance,win,i);
         ray_angle += ray_step;
         i++;
