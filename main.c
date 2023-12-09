@@ -794,21 +794,21 @@ void hook_stuff(void *params)
         if (mlx_is_key_down(win->mlx, ESC))
             exit(0);
         if (mlx_is_key_down(win->mlx, W))
-            MoveForward(win, 2);
+            MoveForward(win, 5);
         else if (mlx_is_key_down(win->mlx, S))
-            MoveBackward(win, 2);
+            MoveBackward(win, 5);
         else if (mlx_is_key_down(win->mlx, A))
-            MoveLeft(win, 2);
+            MoveLeft(win, 5);
         else if (mlx_is_key_down(win->mlx, D))
-            MoveRight(win, 2);
+            MoveRight(win, 5);
         else if (mlx_is_key_down(win->mlx, LEFT))
-            win->map->player->angle -= 0.009;
+            win->map->player->angle -= 0.04;
         else if (mlx_is_key_down(win->mlx, RIGHT))
-            win->map->player->angle += 0.009;
+            win->map->player->angle += 0.04;
         else if(mlx_is_mouse_down(win->mlx,0))
-            win->map->player->angle += 0.009;
+            win->map->player->angle += 0.04;
         else if(mlx_is_mouse_down(win->mlx,1))
-            win->map->player->angle -= 0.009;
+            win->map->player->angle -= 0.04;
         win->img = mlx_new_image(win->mlx, WIDTH, HEIGHT);
         raycast(win);
         render_3d(win);
@@ -954,8 +954,8 @@ double horizget_the_distance(t_mlx *win, double ray_angle, int i)
 		yintercept += ystep;
 
 	}
-    win->ray[i].wall_hit_x = xintercept;
-    win->ray[i].wall_hit_y = yintercept;
+    win->ray[i].wall_hit_xt = xintercept;
+    win->ray[i].wall_hit_yt = yintercept;
     return (sqrt(pow(win->map->player->x - xintercept, 2) + pow(win->map->player->y - yintercept, 2)));
 }
 
@@ -1053,12 +1053,6 @@ void render_3d(t_mlx *win)
         win->texture = mlx_load_png("textures/1.png");
     }
 
-
-        
-        
-    
-	
-
 	projection_distance = (WIDTH / 2)
 		/ tan((60 * (M_PI / 180)) / 2);
 	i = -1;
@@ -1074,24 +1068,28 @@ void render_3d(t_mlx *win)
     
 
 
-    // color = convert_to_rgb(win->texture->pixels);
+
 	y1 = (HEIGHT / 2) - (wall_strip_heightt / 2);
 	y = -1;
     size_t floor = get_color( win->map->floor.r, win->map->floor.g, win->map->floor.b , 255);
     size_t ceiling = get_color( win->map->ceiling.r, win->map->ceiling.g, win->map->ceiling.b, 255);
 
-    int text_offset_x = 0;
+        int **s = malloc(sizeof(int *) * 64 );
+        int w = 0;
+        for(int j = 0; j < 64; j++)
+        {
+            s[j] = malloc(sizeof(int) * 64 );
+            
+            for(int k = 0; k < 64; k++)
+            {
+                s[j][k] = get_color(win->texture->pixels[w], win->texture->pixels[w + 1], win->texture->pixels[w + 2], win->texture->pixels[w + 3]);
+                w += 4;
+            }
+        }
 
-   text_offset_x = (int)win->ray[i].wall_hit_x % 64;
-   if (text_offset_x < 0)
-        text_offset_x = 0;
-//    printf("text_offset_x : %d\n", text_offset_x);
-    double text_offset_y = 64 / wall_strip_heightt;
-    double text_offset_yy = 0;
-    // printf("text_offset_y : %f\n", text_offset_y);
-    int text_offset_ys = text_offset_y;
-
-    // int color = win->texture->pixels[(int)text_offset_y * win->texture->width + text_offset_x];
+        
+        
+        
 
 	while (++y < HEIGHT)
 	{
@@ -1099,13 +1097,20 @@ void render_3d(t_mlx *win)
 		if (y < y1)
 			mlx_put_pixel(win->img, i, y, ceiling);
 		else if (y < y1 + wall_strip_heightt)
-        {
-            int color = win->texture->pixels[(int)text_offset_ys * win->texture->width + text_offset_x];
-            text_offset_yy += text_offset_y;
-            text_offset_ys = (int)text_offset_yy;
-            // printf("text_offset_ys : %d\n", text_offset_ys);
-            // getchar();
-            mlx_put_pixel(win->img, i, y, color);
+        { 
+            int x;
+            int l;
+            if(win->ray[i].was_hit_vertical)
+            {
+                x = fmod(win->ray[i].wall_hit_y, 64);
+            }
+            else
+            {
+                x = fmod(win->ray[i].wall_hit_xt, 64);
+            }
+            l = 64 * (y - y1) / wall_strip_heightt;
+            mlx_put_pixel(win->img, i, y, s[l][x]);
+      
         }
     
 		else

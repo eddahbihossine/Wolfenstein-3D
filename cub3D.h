@@ -43,6 +43,8 @@ typedef struct s_ray
    double ray_angle;
    double ray_distance;
    double wall_hit_x;
+   double wall_hit_xt;
+   double wall_hit_yt;
    double wall_hit_y;
    int was_hit_vertical;
    int is_ray_facing_up;
