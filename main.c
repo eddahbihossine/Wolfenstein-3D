@@ -689,6 +689,20 @@ int get_player_position(t_map *map)
     }
     return (1);
 }
+int open_texture(t_map *map)
+{
+    int no;
+    int so;
+    int we;
+    int ea;
+    no = open(map->no, O_RDONLY);
+    so = open(map->so, O_RDONLY);
+    we = open(map->we, O_RDONLY);
+    ea = open(map->ea, O_RDONLY);
+    if(no == -1 || so == -1 || we == -1 || ea == -1)
+        return (1);
+    return (close(no), close(so), close(we), close(ea), 0);
+}
 
 int parsing_map(t_map *map , int fd, char *str)
 {
@@ -705,6 +719,8 @@ int parsing_map(t_map *map , int fd, char *str)
     if (wall_check(map))
         return (1);
     if (valid_position(map))
+        return (1);
+    if(open_texture(map))
         return (1);
     return (0);
 }
@@ -738,7 +754,7 @@ double degrees_to_radians(double degrees) {
     return degrees * (M_PI / 180);
 }
 // void print_stuff()
-void mlx_draw(t_mlx *win);
+
 
 int check_wall_collision(t_mlx *win, double xx, double yy)
 {
@@ -784,6 +800,7 @@ void MoveRight(t_mlx *mlx, double speed)
     mlx->map->player->y += sin(mlx->map->player->angle + M_PI_2) * speed;
 }
 void render_3d(t_mlx *win);
+void adraw(t_mlx *win);
 void hook_stuff(void *params)
 {
     t_mlx *win = (t_mlx *)params;
@@ -791,6 +808,7 @@ void hook_stuff(void *params)
 
 
         mlx_delete_image(win->mlx, win->img);
+        mlx_delete_image(win->mlx, win->img1);
 
         raycast(win);
         if (mlx_is_key_down(win->mlx, ESC))
@@ -812,8 +830,116 @@ void hook_stuff(void *params)
         else if(mlx_is_mouse_down(win->mlx,1))
             win->map->player->angle -= 0.04;
         win->img = mlx_new_image(win->mlx, WIDTH, HEIGHT);
+        win->img1 = mlx_new_image(win->mlx, WIDTH, HEIGHT);
         render_3d(win);
+         adraw(win);
 }
+
+
+void mlx_draw_rect(t_mlx *win, int x, int y, int color)
+{
+    int i = 0;
+    int j = 0;
+    while (i < 10)
+    {
+        j = 0;
+        while (j < 10)
+        {
+           mlx_put_pixel(win->img, x + j, y + i, color);
+            j++;
+        }
+        i++;
+    }
+}
+void rsmatlplayer(t_mlx *win)
+{
+    for (int i = 0; i < win->map->map_height; i++)
+    {
+        for (int j = 0; j < win->map->map_width; j++)
+        {
+            if(win->map->map[i][j] =='W')
+                mlx_draw_rect(win, j * 64, i * 64, 0x00FFFFFFFf);
+        }
+   
+    }
+}
+// void draw2d(t_mlx *win)
+// {
+//     rsmatlplayer(win);
+    
+    
+// }
+
+
+int mlx_draw(t_mlx *win, int x, int y, int color)
+{
+    int i;
+    int j;
+
+    i = 0;
+    j = 0;
+    while (i < 20)
+    {
+        j = 0;
+        while (j < 20)
+        {
+            mlx_put_pixel(win->img, x + j, y + i, color);
+            j++;
+        }
+        i++;
+    }
+    return (0);
+}
+
+int	has_wall(t_mlx *win, double x, double y);
+void adraw(t_mlx *win)
+{
+    int xmin;
+    int ymin;
+
+    int x ;
+    int y ;
+
+    y = (int)win->map->player->y - 100;
+    ymin =  9;
+    while(ymin < 200)
+    {
+        x = (int)win->map->player->x - 100;
+        xmin = 9;
+        while(xmin < 200)
+        {
+            if(x > 9 && y > 9)
+            {
+                if(has_wall(win, x, y))
+                {
+                    mlx_put_pixel(win->img, ymin, xmin, 0xFFF34675);
+                }
+                else
+                    mlx_put_pixel(win->img, ymin, xmin, 0x0DEADBF);
+            }
+            else
+                mlx_put_pixel(win->img, ymin, xmin, 0x000000000);
+            x++;
+            xmin++;
+        }
+        y++;
+        ymin++;
+    }
+
+    ymin = 9;
+    while(ymin < 14)
+    {
+        xmin = 9;
+        while(xmin < 14)
+        {
+            mlx_put_pixel(win->img, xmin + 100 , ymin + 100, 0x000000000);
+            xmin++;
+        }
+        ymin++;
+    }
+    mlx_image_to_window(win->mlx, win->img, 0, 0);
+}
+
 
 int check_whichside(t_mlx *win)
 {
@@ -1192,11 +1318,15 @@ int main(int ac, char **av)
     }
     window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
     window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
+    window->img1 = mlx_new_image(window->mlx, 22,22);
    
     init_params(window);
     mlx_image_to_window(window->mlx, window->img, 0, 0);
+    mlx_image_to_window(window->mlx, window->img1, 0, 0);
     mlx_loop_hook(window->mlx, hook_stuff, window);
     // render_3d(window);
+    // draw2d(window);
+    // adraw(window);
     mlx_loop(window->mlx);
     ft_free_window(&window);
     close(fd);
