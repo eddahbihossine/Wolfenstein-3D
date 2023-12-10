@@ -35,6 +35,10 @@
 #define WIDTH 800
 #define HEIGHT 800
 #ifndef BUFFER_SIZE
+#define TEXTURE_NO 0
+#define TEXTURE_SO 1
+#define TEXTURE_WE 2
+#define TEXTURE_EA 3
 # define BUFFER_SIZE 42
 #endif
 

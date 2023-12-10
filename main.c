@@ -791,6 +791,8 @@ void hook_stuff(void *params)
 
 
         mlx_delete_image(win->mlx, win->img);
+
+        raycast(win);
         if (mlx_is_key_down(win->mlx, ESC))
             exit(0);
         if (mlx_is_key_down(win->mlx, W))
@@ -810,11 +812,7 @@ void hook_stuff(void *params)
         else if(mlx_is_mouse_down(win->mlx,1))
             win->map->player->angle -= 0.04;
         win->img = mlx_new_image(win->mlx, WIDTH, HEIGHT);
-        raycast(win);
         render_3d(win);
-   
-    
-
 }
 
 int check_whichside(t_mlx *win)
@@ -843,13 +841,13 @@ int check_whichside(t_mlx *win)
 void set_the_vision_angle(t_mlx *win, int side)
 {
     if (side == 1)
-        win->map->player->angle =  3 * M_PI / 2;
+        win->map->player->angle = M_PI_2;
     else if (side == 2)
-        win->map->player->angle =  M_PI / 2;
+        win->map->player->angle = 3 * M_PI_2;
     else if (side == 3)
-        win->map->player->angle =  M_PI;
+        win->map->player->angle = M_PI;
     else if (side == 4)
-        win->map->player->angle =  0;
+        win->map->player->angle = 0;
 }  
 void init_params(t_mlx *win)
 {
@@ -893,10 +891,6 @@ int check_leftorrigh( double ray_angle)
         return (1);
     return (0);
 }
-
-
-
-
 
 
 int	has_wall(t_mlx *win, double x, double y)
@@ -1026,10 +1020,26 @@ size_t get_color(int r, int g, int b, int a)
     return ((r & 255) << 24) + ((g & 255) << 16) + ((b & 255) << 8)
            + (a & 255);
 }
-// void texture_thewall(t_mlx *win)
-// {
+int check_whichtexture(t_mlx *win,int i) {
 
-// }
+    if(win->ray[i].was_hit_vertical)
+    {
+        if(check_leftorrigh(win->ray[i].ray_angle))
+            return (0);
+        else
+            return (1);
+    }
+    else
+    {
+        if(check_upordown(win->ray[i].ray_angle))
+            return (2);
+        else
+            return (3);
+    }
+   
+    
+    return (-1);
+}
 void render_3d(t_mlx *win)
 {
 
@@ -1044,52 +1054,22 @@ void render_3d(t_mlx *win)
     {
         ptr[i] = malloc(sizeof(mlx_texture_t));
     }
-    
-
         ptr[0] = mlx_load_png(win->map->no);
         ptr[1] = mlx_load_png(win->map->so);
         ptr[2] = mlx_load_png(win->map->we);
         ptr[3] = mlx_load_png(win->map->ea);
-
-        int texture_index = 0;
         int **s;
 
-
-
-	projection_distance = (WIDTH / 2)
-		/ tan((60 * (M_PI / 180)) / 2);
+	projection_distance = (WIDTH / 2) / tan((60 * (M_PI / 180)) / 2);
 	i = -1;
 	while (++i < 800)
 	{
-    if (win->ray[i].was_hit_vertical)
-    {
-        if (win->ray[i].ray_angle > 0 && win->ray[i].ray_angle < M_PI)
-            texture_index = 1; // South texture
-        else
-            texture_index = 0; // North texture
-    }
-    else
-    {
-        if (win->ray[i].ray_angle > M_PI_2 && win->ray[i].ray_angle < 3 * M_PI_2)
-            texture_index = 3; // East texture
-        else
-            texture_index = 2; // West texture
-    }
+    int texture_index = check_whichtexture(win, i);
     win->texture = ptr[texture_index];
-		correct_distance = win->ray[i].ray_distance
-			* cos(win->map->player->angle - win->ray[i].ray_angle);
-		 double wall_strip_heightt = 
-			projection_distance * 64
-			/ correct_distance;
+	correct_distance = win->ray[i].ray_distance * cos(win->map->player->angle - win->ray[i].ray_angle);
+    double wall_strip_heightt = projection_distance * 64 / correct_distance;
 	int	y;
 	int	y1;
-
-
-   
-    
-
-    
-
 	y1 = (HEIGHT / 2) - (wall_strip_heightt / 2);
 	y = -1;
     size_t floor = get_color( win->map->floor.r, win->map->floor.g, win->map->floor.b , 255);
@@ -1214,10 +1194,9 @@ int main(int ac, char **av)
     window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
    
     init_params(window);
-    raycast(window);
-    render_3d(window);
     mlx_image_to_window(window->mlx, window->img, 0, 0);
     mlx_loop_hook(window->mlx, hook_stuff, window);
+    // render_3d(window);
     mlx_loop(window->mlx);
     ft_free_window(&window);
     close(fd);
