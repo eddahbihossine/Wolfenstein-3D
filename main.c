@@ -912,17 +912,7 @@ int	has_wall(t_mlx *win, double x, double y)
         return (1);
     return (win->map->map[i][j] == '1');
 }
-// 	int	i;
-// 	int	j;
 
-// 	if (x < 0 ||  y < 0)
-// 		return (1);
-// 	i = floor(y / 64);
-// 	j = floor(x / 64);
-// 	if (i >= 800 || j >= 800)
-// 		return (1);
-// 	return (win->map->map[i][j] == '1');
-// }
 
 double horizget_the_distance(t_mlx *win, double ray_angle, int i)
 {
@@ -1046,18 +1036,46 @@ void render_3d(t_mlx *win)
 	double	correct_distance;
 	double	projection_distance;
 	int		i = 0;
+    mlx_texture_t **ptr;
 
-    if(!win->texture)
+    ptr = malloc(sizeof(mlx_texture_t *) * 4);
+
+    for (int i = 0; i < 4; i++)
     {
-        win->texture = malloc(sizeof(mlx_texture_t));
-        win->texture = mlx_load_png("textures/1.png");
+        ptr[i] = malloc(sizeof(mlx_texture_t));
     }
+    
+
+        ptr[0] = mlx_load_png(win->map->no);
+        ptr[1] = mlx_load_png(win->map->so);
+        ptr[2] = mlx_load_png(win->map->we);
+        ptr[3] = mlx_load_png(win->map->ea);
+
+        int texture_index = 0;
+        int **s;
+
+
 
 	projection_distance = (WIDTH / 2)
 		/ tan((60 * (M_PI / 180)) / 2);
 	i = -1;
 	while (++i < 800)
 	{
+    if (win->ray[i].was_hit_vertical)
+    {
+        if (win->ray[i].ray_angle > 0 && win->ray[i].ray_angle < M_PI)
+            texture_index = 1; // South texture
+        else
+            texture_index = 0; // North texture
+    }
+    else
+    {
+        if (win->ray[i].ray_angle > M_PI_2 && win->ray[i].ray_angle < 3 * M_PI_2)
+            texture_index = 3; // East texture
+        else
+            texture_index = 2; // West texture
+    }
+    win->texture = ptr[texture_index];
 		correct_distance = win->ray[i].ray_distance
 			* cos(win->map->player->angle - win->ray[i].ray_angle);
 		 double wall_strip_heightt = 
@@ -1065,16 +1083,19 @@ void render_3d(t_mlx *win)
 			/ correct_distance;
 	int	y;
 	int	y1;
+
+
+   
     
 
-
+    
 
 	y1 = (HEIGHT / 2) - (wall_strip_heightt / 2);
 	y = -1;
     size_t floor = get_color( win->map->floor.r, win->map->floor.g, win->map->floor.b , 255);
     size_t ceiling = get_color( win->map->ceiling.r, win->map->ceiling.g, win->map->ceiling.b, 255);
 
-        int **s = malloc(sizeof(int *) * 64 );
+        s = malloc(sizeof(int *) * 64 );
         int w = 0;
         for(int j = 0; j < 64; j++)
         {
@@ -1087,13 +1108,9 @@ void render_3d(t_mlx *win)
             }
         }
 
-        
-        
-        
 
 	while (++y < HEIGHT)
 	{
-
 		if (y < y1)
 			mlx_put_pixel(win->img, i, y, ceiling);
 		else if (y < y1 + wall_strip_heightt)
@@ -1110,13 +1127,27 @@ void render_3d(t_mlx *win)
             }
             l = 64 * (y - y1) / wall_strip_heightt;
             mlx_put_pixel(win->img, i, y, s[l][x]);
-      
         }
     
 		else
 			mlx_put_pixel(win->img, i, y, (u_int32_t)floor);
 	}
     }
+    int j = 0;
+    while(j < 4)
+    {
+        free(ptr[j]);
+        j++;
+    }
+    free(ptr);
+    int k = 0;
+    while(k < 64)
+    {
+        free(s[k]);
+        k++;
+    }
+    free(s);
+
     mlx_image_to_window(win->mlx, win->img, 0, 0);
 }
 
@@ -1149,6 +1180,7 @@ void raycast(t_mlx *win)
  
 }
 
+
 int main(int ac, char **av) 
 {
     int fd;
@@ -1180,10 +1212,10 @@ int main(int ac, char **av)
     }
     window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
     window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
+   
     init_params(window);
     raycast(window);
     render_3d(window);
-    // mlx_draw(window);
     mlx_image_to_window(window->mlx, window->img, 0, 0);
     mlx_loop_hook(window->mlx, hook_stuff, window);
     mlx_loop(window->mlx);
