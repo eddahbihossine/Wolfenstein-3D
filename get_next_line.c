@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: heddahbi <heddahbi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/09 22:41:30 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/06 16:17:26 by heddahbi         ###   ########.fr       */
+/*   Updated: 2023/12/11 01:24:19 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int	ft_check_new_line(char *str)
 			return (i);
 		i++;
 	}
-	return (1);
+	return (-1);
 }
 
 char	*get_next_line(int fd)
@@ -64,7 +64,7 @@ char	*get_next_line(int fd)
 			break ;
 		str = ft_strjoin(str, buff);
 		new_line = ft_check_new_line(str);
-		if (new_line != 1)
+		if (new_line != -1)
 			return (free(buff), ft_get_line(&str, &line, new_line));
 		if (!reader)
 			return (free(buff), get_rest(&str, 0));
