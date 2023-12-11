@@ -6,7 +6,7 @@
 #    By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/05 02:44:37 by abel-hid          #+#    #+#              #
-#    Updated: 2023/12/11 19:32:10 by abel-hid         ###   ########.fr        #
+#    Updated: 2023/12/11 21:48:29 by abel-hid         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,6 +18,7 @@ SRCS =	main.c\
 		get_next_line_utils.c\
 		split.c\
 		parsing_cub.c\
+		parssing.c\
 		floor.c\
 		init_map.c\
 		empty.c\
@@ -25,6 +26,10 @@ SRCS =	main.c\
 		map.c\
 		free_map.c\
 		player.c\
+		update_map.c\
+		wall.c\
+		moves.c\
+		hook.c\
 
 OBJS = $(SRCS:.c=.o)
 

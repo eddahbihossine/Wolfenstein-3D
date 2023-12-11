@@ -6,7 +6,7 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 19:18:08 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/11 19:31:13 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 20:36:14 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,4 +113,30 @@ int	get_longest_line(t_map *map)
 		i++;
 	}
 	return (max);
+}
+
+int	get_player_position(t_map *map)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	j = 0;
+	while (map->map[i] != NULL)
+	{
+		j = 0;
+		while (map->map[i][j] != '\0')
+		{
+			if (map->map[i][j] == 'N' || map->map[i][j] == 'S'
+				|| map->map[i][j] == 'W' || map->map[i][j] == 'E')
+			{
+				map->player->x = j * 64 + 32 ;
+				map->player->y = i * 64 + 32;
+				return (0);
+			}
+			j++;
+		}
+		i++;
+	}
+	return (1);
 }

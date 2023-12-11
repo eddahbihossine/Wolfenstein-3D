@@ -6,7 +6,7 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/11 19:31:57 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 21:51:16 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,13 @@ typedef struct  s_color
     int b;
 }               t_color;
 
+typedef struct  s_map_2d
+{
+    int xmin;
+    int ymin;
+    int x;
+    int y;
+}               t_map_2d;
 typedef struct	s_map
 {
     char	**map;
@@ -98,6 +105,7 @@ typedef struct s_mlx
     t_map *map;
     t_ray ray[WIDTH];
     mlx_texture_t *texture;
+    t_map_2d map_2d;
 
     
 } t_mlx;
@@ -151,4 +159,25 @@ int	get_longest_line(t_map *map);
 int	check_valid_map(t_map *map);
 int	valid_position(t_map *map);
 int	check_player_position(t_map *map);
+int	update_map(t_map *map);
+void	init_widht_height(t_map *map);
+int	check_wall(t_map *map);
+int	valid_walls(t_map *map);
+int	valid_wall_help(t_map *map, int i, int j);
+int front_wall(char *line);
+int back_wall(char *line);
+int	wall_check(t_map *map);
+int	get_player_position(t_map *map);
+int	open_texture(t_map *map);
+int	parsing_map(t_map *map, int fd, char *str);
+void	init__map(t_map *map);
+void	moveright(t_mlx *mlx, double speed);
+void	moveleft(t_mlx *mlx, double speed);
+void	movebackward(t_mlx *mlx, double speed);
+void	moveforward(t_mlx *mlx, double speed);
+void	hook_stuff(void *params);
+double	radians_to_degrees(double radians);
+double	degrees_to_radians(double degrees);
+int	check_wall_collision(t_mlx *win, double xx, double yy);
+void	re_draw(t_mlx *win);
 #endif

@@ -9,6 +9,9 @@
 
 
 
+void	render_3d(t_mlx *win);
+void	adraw(t_mlx *win);
+int	has_wall(t_mlx *win, double x, double y);
 
 
 void f()
@@ -17,520 +20,137 @@ void f()
 }
 
 
-
-int check_wall(t_map *map)
-{
-    int i = 0;
-    int j = 0;
-    while (map->map[i] != NULL)
-    {
-        j = 0;
-        while (map->map[i][j] != '\0')
-        {
-            if (map->map[i][j] == '2')
-                    return (1);
-            j++;
-        }
-        i++;
-    }
-    return (0);
-}
-
-void init_widht_height(t_map *map)
-{
-    map->map_width = get_longest_line(map);
-    map->map_height = get_height(map);
-}
-
-
-char get_char(t_map *map, int i, int j)
-{
-   if (map->map[i][j])
-    {
-        if(map->map[i][j] != '1' && map->map[i][j] != '0' && map->map[i][j] != 'N' && map->map[i][j] != 'S' && map->map[i][j] != 'W' && map->map[i][j] != 'E' && map->map[i][j] != ' ')
-            return ('2');
-        else
-            return (map->map[i][j]);
-    }
-    else
-        return ('\0');
-    return ('\0');
-}
-
-int update_map(t_map *map)
-{
-    int i;
-    int j ;
-    char *tmp;
-
-    i = 0;
-    j = 0;
-    tmp = NULL;
-    init_widht_height(map);
-    while(i < map->map_height)
-    {
-        j = 0;
-        tmp = malloc(sizeof(char) * (map->map_width + 1));
-        while (j < map->map_width)
-        {
-           if((size_t)j < ft_strlen(map->map[i]))
-                tmp[j] = get_char(map, i, j);
-            else
-                tmp[j] = ' ';
-            j++;
-        }
-        tmp[j] = '\0';
-        free(map->map[i]);
-        map->map[i] = tmp;
-        i++;
-    }
-    free_empty_line(map, &i);
-    return (0);
-}
-
-int valid_wall_help(t_map *map, int i, int j)
-{
-    if(i == map->map_height - 1)
-    {
-        if (map->map[i][j]  == '0')
-        {
-            if(map->map[i][j - 1] == '0')
-                return (1);
-        }
-    }
-    if (map->map[i][j]  == '0')
-    {
-        if(map->map[i][j + 1] == '0')
-            return (1);
-    }
-    return (0);
-}
-
-int valid_walls(t_map *map)
-{
-    int i ;
-    int j;
-
-    i = 0;
-    while (map->map[i] != NULL)
-    {
-        j = 0;
-        while (map->map[i][j] != '\0')
-        {
-            if (i == 0 || i == map->map_height - 1)
-                if(valid_wall_help(map, i, j))
-                    return (1);
-            if (map->map[i][j] == '0' && i != 0 && i != map->map_height - 1 && j != 0 && j != map->map_width - 1)
-            {
-                if ((map->map[i - 1][j] == ' ' || map->map[i + 1][j] == ' ' || map->map[i][j - 1] == ' ' || map->map[i][j + 1] == ' ') \
-                    || (map->map[i - 1][j] == '\0' || map->map[i + 1][j] == '\0' || map->map[i][j - 1] == '\0' || map->map[i][j + 1] == '\0'))
-                    return (1);
-                 
-            }
-            j++;
-        }
-        i++;
-    }
-    return (0);
-}
-
-
-int front_wall(char *line)
-{
-    int i ;
-    char *wall;
-
-    i = 0;
-    wall = ft_strtrim(line, " ");
-    while (wall[i] != '\0') 
-    {
-        while(wall[i] == ' ')
-            i++;
-        if (wall[i] != '1') 
-        {
-            free(wall);
-            return 1;
-        }
-        i++;
-    }
-    free(wall);
-    return (0);
-}
-
-int back_wall(char *line)
-{
-    int i;
-    char *wall;
-
-    i = 0;
-    wall = ft_strtrim(line, " ");
-    while (wall[i] != '\0') 
-    {
-        while(wall[i] == ' ')
-            i++;
-        if (wall[i] != '1') 
-        {
-            free(wall);
-            return 1;
-        }
-        i++;
-    }
-    free(wall);
-    return (0);
-}
 void raycast(t_mlx *win);
-int wall_check(t_map *map) 
+
+void	ft_free_window(t_mlx **window)
 {
-    int i;
-    char *wall;
-
-    i = 0;
-    if (map == NULL || map->map == NULL || map->map[0] == NULL) 
-        return 1;
-    if(front_wall(map->map[0]))
-        return (1);
-    i = 1;
-    while (map->map[i] != NULL) 
-    {
-        if(map->map[i + 1] == NULL)
-            break;
-        wall = ft_strtrim(map->map[i], " ");
-        if (wall[0] != '1' || wall[ft_strlen(wall) - 1] != '1') 
-        {
-            free(wall);
-            return 1;
-        }
-        free(wall);
-        i++;
-    }
-    if(back_wall(map->map[i]))
-        return (1);
-    return 0;
+	ft_free_map(&(*window)->map);
+	free((*window));
 }
 
-int get_player_position(t_map *map)
+void	re_draw(t_mlx *win)
 {
-    int i = 0;
-    int j = 0;
-    while (map->map[i] != NULL)
-    {
-        j = 0;
-        while (map->map[i][j] != '\0')
-        {
-            if (map->map[i][j] == 'N' || map->map[i][j] == 'S' || map->map[i][j] == 'W' || map->map[i][j] == 'E')
-            {
-                // x and y are the coordinates of the player
-                map->player->x = j* 64 + 32 ;
-                map->player->y = i  *64 +32;
-  
-                return (0);
-            }
-            j++;
-        }
-        i++;
-    }
-    return (1);
+	win->img = mlx_new_image(win->mlx, WIDTH, HEIGHT);
+	win->img1 = mlx_new_image(win->mlx, WIDTH, HEIGHT);
+	raycast(win);
+	render_3d(win);
+	adraw(win);
 }
 
-int open_texture(t_map *map)
+
+
+int	mlx_draw(t_mlx *win, int x, int y, int color)
 {
-    int no;
-    int so;
-    int we;
-    int ea;
+	int	i;
+	int	j;
 
-    no = open(map->no, O_RDONLY);
-    if(no == -1)
-        return (1);
-    so = open(map->so, O_RDONLY);
-    if(so == -1)
-        return (1);
-    we = open(map->we, O_RDONLY);
-    if(we == -1)
-        return (1);
-    ea = open(map->ea, O_RDONLY);
-    if(ea == -1)
-        return (1);
-    return (close(no), close(so), close(we), close(ea), 0);
+	i = 0;
+	j = 0;
+	while (i < 20)
+	{
+		j = 0;
+		while (j < 20)
+		{
+			mlx_put_pixel(win->img, x + j, y + i, color);
+			j++;
+		}
+		i++;
+	}
+	return (0);
 }
-int parsing_map(t_map *map , int fd, char *str)
+
+void	draw_minimap(t_mlx *win)
 {
-    if(init_all(map, fd, str) || check_player_position(map))
-        return (1);
-    if(update_map(map) || check_wall(map))
-        return (1);
-    if (get_player_position(map))
-        return (1);
-     if (check_valid_map(map))
-        return (1);
-    if (valid_walls(map))
-        return (1);
-    if (wall_check(map))
-        return (1);
-    if (valid_position(map))
-        return (1);
-    if(open_texture(map))
-        return (1);
-    return (0);
+	if (win->map_2d.x > 9 && win->map_2d.y > 9)
+	{
+		if (has_wall(win, win->map_2d.x, win->map_2d.y))
+			mlx_put_pixel(win->img, win->map_2d.ymin,
+				win->map_2d.xmin, 0xFFF34675);
+		else
+			mlx_put_pixel(win->img, win->map_2d.ymin,
+				win->map_2d.xmin, 0x0DEADBF);
+	}
+	else
+		mlx_put_pixel(win->img, win->map_2d.ymin,
+			win->map_2d.xmin, 0x000000000);
+	win->map_2d.x++;
+	win->map_2d.xmin++;
 }
-
-void init__map(t_map *map)
+void	adraw(t_mlx *win)
 {
-    map->no = NULL;
-    map->so = NULL;
-    map->we = NULL;
-    map->ea = NULL;
-    map->map = NULL;
-    map->map_width = 0;
-    map->map_height = 0;
-    map->floor.r = -42;
-    map->floor.g = 0;
-    map->floor.b = 0;
-    map->ceiling.r = -42;
-    map->ceiling.g = 0;
-    map->ceiling.b = 0;
-}
-double radians_to_degrees(double radians) {
-    return radians * (180.0 / M_PI);
+	win->map_2d.y = (int)win->map->player->y - 100;
+	win->map_2d.ymin = 9;
+	while (win->map_2d.ymin < 200)
+	{
+		win->map_2d.x = (int)win->map->player->x - 100;
+		win->map_2d.xmin = 9;
+		while (win->map_2d.xmin < 200)
+			draw_minimap(win);
+		win->map_2d.y++;
+		win->map_2d.ymin++;
+	}
+	win->map_2d.ymin = 9;
+	while (win->map_2d.ymin < 14)
+	{
+		win->map_2d.xmin = 9;
+		while (win->map_2d.xmin < 14)
+		{
+			mlx_put_pixel(win->img, win->map_2d.xmin + 100,
+				win->map_2d.ymin + 100, 0x000000000);
+			win->map_2d.xmin++;
+		}
+		win->map_2d.ymin++;
+	}
+	mlx_image_to_window(win->mlx, win->img, 0, 0);
 }
 
-void ft_free_window(t_mlx **window)
+
+int	check_whichside(t_mlx *win)
 {
-    ft_free_map(&(*window)->map);
-    free((*window));
-}
-double degrees_to_radians(double degrees) {
-    return degrees * (M_PI / 180);
-}
-// void print_stuff()
+	int	i;
+	int	j;
 
+	i = 0;
+	j = 0;
+	while (win->map->map[i] != NULL)
+	{
+		j = 0;
+		while (win->map->map[i][j] != '\0')
+		{
+			if (win->map->map[i][j] == 'N')
+				return (1);
+			if (win->map->map[i][j] == 'S')
+				return (2);
+			if (win->map->map[i][j] == 'W')
+				return (3);
+			if (win->map->map[i][j] == 'E')
+				return (4);
+			j++;
+		}
+		i++;
+	}
+	return (0);
+}
 
-int check_wall_collision(t_mlx *win, double xx, double yy)
+void	set_the_vision_angle(t_mlx *win, int side)
 {
-    int x;
-    int y;
-
-    x = floor(xx / 64);
-    y = floor(yy / 64);
-        if(win->ray[0].ray_distance< 12 && win->ray[799].ray_distance  < 12)
-        {
-            if(win->ray[0].ray_distance < win->ray[799 /2].ray_distance &&  win->ray[799].ray_distance < win->ray[799 /2].ray_distance )
-                return(6);
-        }
-    
-    if (x < 0 || y < 0 || x > win->map->map_width || y > win->map->map_height)
-        return (1);
-    return (win->map->map[y][x] == '1');
-}
-void MoveForward(t_mlx *mlx, double speed)
-{
-     if(check_wall_collision(mlx,mlx->map->player->x + cos(mlx->map->player->angle) * speed,mlx->map->player->y+ cos(mlx->map->player->angle) * speed) == 6 )
-        return ;
-    if(check_wall_collision(mlx, mlx->map->player->x, mlx->map->player->y)
-    || check_wall_collision(mlx, mlx->map->player->x + cos(mlx->map->player->angle) * speed, mlx->map->player->y + sin(mlx->map->player->angle) * speed))
-        return ;
-    mlx->map->player->x += cos(mlx->map->player->angle) * speed;
-    mlx->map->player->y += sin(mlx->map->player->angle) * speed;
+	if (side == 1)
+		win->map->player->angle = M_PI_2;
+	else if (side == 2)
+		win->map->player->angle = 3 * M_PI_2;
+	else if (side == 3)
+		win->map->player->angle = M_PI;
+	else if (side == 4)
+		win->map->player->angle = 0;
 }
 
-void MoveBackward(t_mlx *mlx, double speed)
+void	init_params(t_mlx *win)
 {
-   
-   if(check_wall_collision(mlx,mlx->map->player->x + cos(mlx->map->player->angle) * speed,mlx->map->player->y+ cos(mlx->map->player->angle) * speed) == 6 )
-        return ;
-    if(check_wall_collision(mlx, mlx->map->player->x, mlx->map->player->y)|| check_wall_collision(mlx, mlx->map->player->x - cos(mlx->map->player->angle) * speed, mlx->map->player->y - sin(mlx->map->player->angle) * speed))
-        return ;
-    mlx->map->player->x -= cos(mlx->map->player->angle) * speed;
-    mlx->map->player->y -= sin(mlx->map->player->angle) * speed;
+	win->map->player->fov = degrees_to_radians(60);
+	win->map->player->number_rays = WIDTH;
+	set_the_vision_angle(win, check_whichside(win));
 }
 
-void MoveLeft(t_mlx *mlx, double speed)
-{
-     if(check_wall_collision(mlx,mlx->map->player->x + cos(mlx->map->player->angle) * speed,mlx->map->player->y+ cos(mlx->map->player->angle) * speed) == 6 )
-        return ;
-    if(check_wall_collision(mlx, mlx->map->player->x, mlx->map->player->y) || check_wall_collision(mlx, mlx->map->player->x + cos(mlx->map->player->angle - M_PI_2) * speed, mlx->map->player->y + sin(mlx->map->player->angle - M_PI_2) * speed))
-        return ;
-    mlx->map->player->x += cos(mlx->map->player->angle - M_PI_2) * speed;
-    mlx->map->player->y += sin(mlx->map->player->angle - M_PI_2) * speed;
-}
-
-void MoveRight(t_mlx *mlx, double speed)
-{
-     if(check_wall_collision(mlx,mlx->map->player->x + cos(mlx->map->player->angle) * speed,mlx->map->player->y+ cos(mlx->map->player->angle) * speed) == 6 )
-        return ;
-    if(check_wall_collision(mlx, mlx->map->player->x, mlx->map->player->y) || check_wall_collision(mlx, mlx->map->player->x + cos(mlx->map->player->angle + M_PI_2) * speed, mlx->map->player->y + sin(mlx->map->player->angle + M_PI_2) * speed))
-        return ;
-    mlx->map->player->x += cos(mlx->map->player->angle + M_PI_2) * speed;
-    mlx->map->player->y += sin(mlx->map->player->angle + M_PI_2) * speed;
-}
-
-void print_values(t_mlx *mlx)
-{
-    int i =0;
-    while(i < 800)
-    {
-        printf("%f\n",mlx->ray[i].ray_distance);
-        // getchar();
-
-    }
-
-}
-void render_3d(t_mlx *win);
-void adraw(t_mlx *win);
-void hook_stuff(void *params)
-{
-    t_mlx *win = (t_mlx *)params;
-
-
-
-        mlx_delete_image(win->mlx, win->img);
-        mlx_delete_image(win->mlx, win->img1);
-
-        if (mlx_is_key_down(win->mlx, ESC))
-            exit(0);
-        if (mlx_is_key_down(win->mlx, W))
-            MoveForward(win, 5);
-        else if (mlx_is_key_down(win->mlx, S))
-            MoveBackward(win, 5);
-        else if (mlx_is_key_down(win->mlx, A))
-            MoveLeft(win, 5);
-        else if (mlx_is_key_down(win->mlx, D))
-            MoveRight(win, 5);
-        else if (mlx_is_key_down(win->mlx, LEFT))
-            win->map->player->angle -= 0.04;
-        else if (mlx_is_key_down(win->mlx, RIGHT))
-            win->map->player->angle += 0.04;
-        else if(mlx_is_mouse_down(win->mlx,0))
-            win->map->player->angle += 0.04;
-        else if(mlx_is_mouse_down(win->mlx,1))
-            win->map->player->angle -= 0.04;
-        win->img = mlx_new_image(win->mlx, WIDTH, HEIGHT);
-        win->img1 = mlx_new_image(win->mlx, WIDTH, HEIGHT);
-        raycast(win);
-        // print_values(win);
-        render_3d(win);
-        adraw(win);
-}
-
-
-// void draw2d(t_mlx *win)
-// {
-//     rsmatlplayer(win);
-    
-    
-// }
-
-
-int mlx_draw(t_mlx *win, int x, int y, int color)
-{
-    int i;
-    int j;
-
-    i = 0;
-    j = 0;
-    while (i < 20)
-    {
-        j = 0;
-        while (j < 20)
-        {
-            mlx_put_pixel(win->img, x + j, y + i, color);
-            j++;
-        }
-        i++;
-    }
-    return (0);
-}
-
-int	has_wall(t_mlx *win, double x, double y);
-void adraw(t_mlx *win)
-{
-    int xmin;
-    int ymin;
-
-    int x ;
-    int y ;
-
-    y = (int)win->map->player->y - 100;
-    ymin =  9;
-    while(ymin < 200)
-    {
-        x = (int)win->map->player->x - 100;
-        xmin = 9;
-        while(xmin < 200)
-        {
-            if(x > 9 && y > 9)
-            {
-                if(has_wall(win, x, y))
-                {
-                    mlx_put_pixel(win->img, ymin, xmin, 0xFFF34675);
-                }
-                else
-                    mlx_put_pixel(win->img, ymin, xmin, 0x0DEADBF);
-            }
-            else
-                mlx_put_pixel(win->img, ymin, xmin, 0x000000000);
-            x++;
-            xmin++;
-        }
-        y++;
-        ymin++;
-    }
-
-    ymin = 9;
-    while(ymin < 14)
-    {
-        xmin = 9;
-        while(xmin < 14)
-        {
-            mlx_put_pixel(win->img, xmin + 100 , ymin + 100, 0x000000000);
-            xmin++;
-        }
-        ymin++;
-    }
-    mlx_image_to_window(win->mlx, win->img, 0, 0);
-}
-
-
-int check_whichside(t_mlx *win)
-{
-    int i = 0;
-    int j = 0;
-    while (win->map->map[i] != NULL)
-    {
-        j = 0;
-        while (win->map->map[i][j] != '\0')
-        {
-            if (win->map->map[i][j] == 'N')
-                return (1);
-            if (win->map->map[i][j] == 'S')
-                return (2);
-            if (win->map->map[i][j] == 'W')
-                return (3);
-            if (win->map->map[i][j] == 'E')
-                return (4);
-            j++;
-        }
-        i++;
-    }
-    return (0);
-}
-void set_the_vision_angle(t_mlx *win, int side)
-{
-    if (side == 1)
-        win->map->player->angle = M_PI_2;
-    else if (side == 2)
-        win->map->player->angle = 3 * M_PI_2;
-    else if (side == 3)
-        win->map->player->angle = M_PI;
-    else if (side == 4)
-        win->map->player->angle = 0;
-}  
-void init_params(t_mlx *win)
-{
-    win->map->player->fov = degrees_to_radians(60);
-    win->map->player->number_rays = WIDTH;
-    set_the_vision_angle(win, check_whichside(win));
-}
 int	xray_direction(double ray_angle)
 {
 	return (fabs(cos(ray_angle)) / cos(ray_angle));
@@ -540,83 +160,85 @@ int	yray_direction(double ray_angle)
 {
 	return (fabs(sin(ray_angle)) / sin(ray_angle));
 }
-int check_intersection(t_mlx *win, int x, int y)
-{   
-       int        i;
-        int        j;
 
-        if (x < 0 || x > win->map->map_width  || y < 0
-                || y > win->map->map_height)
-                return (1);
-        i = floor(y);
-        j = floor(x);
-        if (i >= win->map->map_height || j >= win->map->map_width )
-                return (1);
-        return (win->map->map[i][j] == '1');
-
-}
-int check_upordown(double ray_angle)
+int	check_intersection(t_mlx *win, int x, int y)
 {
-    if (ray_angle > 0 && ray_angle < M_PI)
-        return (1);
-    return (0);
-}
-int check_leftorrigh( double ray_angle)
-{
-    if (ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2)
-        return (1);
-    return (0);
+	int	i;
+	int	j;
+
+	if (x < 0 || x > win->map->map_width || y < 0
+		|| y > win->map->map_height)
+		return (1);
+	i = floor(y);
+	j = floor(x);
+	if (i >= win->map->map_height || j >= win->map->map_width)
+		return (1);
+	return (win->map->map[i][j] == '1');
 }
 
+int	check_upordown(double ray_angle)
+{
+	if (ray_angle > 0 && ray_angle < M_PI)
+		return (1);
+	return (0);
+}
+
+int	check_leftorrigh( double ray_angle)
+{
+	if (ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2)
+		return (1);
+	return (0);
+}
 
 int	has_wall(t_mlx *win, double x, double y)
 {
 	int	i;
 	int	j;
 
-	if (x < 0 || y < 0 || x > win->map->map_width * 64 || y > win->map->map_height * 64)
-        return (1); 
-    i = floor(y / 64);
-    j = floor(x / 64);
-    if (i >= win->map->map_height || j >= win->map->map_width)
-        return (1);
-    return (win->map->map[i][j] == '1');
+	if (x < 0 || y < 0 || x > win->map->map_width * 64
+		|| y > win->map->map_height * 64)
+		return (1);
+	i = floor(y / 64);
+	j = floor(x / 64);
+	if (i >= win->map->map_height || j >= win->map->map_width)
+		return (1);
+	return (win->map->map[i][j] == '1');
 }
 
-
-double horizget_the_distance(t_mlx *win, double ray_angle, int i)
+double	ft_sqrt(t_mlx *win ,int x , int y, int i)
 {
-	double	xintercept;
-	double	yintercept;
-	yintercept = floor(win->map->player->y / 64)
-		* 64;
-	if (ray_angle > 0 && ray_angle < M_PI)
-		yintercept += 64;
-	xintercept = win->map->player->x + ((yintercept - win->map->player->y)
-			/ tan(ray_angle));
+	win->ray[i].wall_hit_xt = x;
+	win->ray[i].wall_hit_yt = y;
+	return (sqrt(pow(win->map->player->x - x, 2)
+			+ pow(win->map->player->y - y, 2)));
+}
+double	horizget_the_distance(t_mlx *win, double ray_angle, int i)
+{
+	double	x;
+	double	y;
 	double	xstep;
 	double	ystep;
 
+	y = floor(win->map->player->y / 64) * 64;
+	if (ray_angle > 0 && ray_angle < M_PI)
+		y += 64;
+	x = win->map->player->x + ((y - win->map->player->y) / tan(ray_angle));
 	ystep = 64;
 	if (ray_angle > M_PI)
 		ystep *= -1;
 	xstep = 64 / tan(ray_angle);
 	if (ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2 && xstep > 0)
 		xstep *= -1;
-	if ((ray_angle < M_PI / 2 || ray_angle > 3 * M_PI  / 2) && xstep < 0)
+	if ((ray_angle < M_PI / 2 || ray_angle > 3 * M_PI / 2) && xstep < 0)
 		xstep *= -1;
 	if (ray_angle > M_PI)
-		yintercept -= 0.1;
-
-	while (!has_wall(win, xintercept, yintercept))
+		y -= 0.1;
+	while (!has_wall(win, x, y))
 	{
-		xintercept += xstep;
-		yintercept += ystep;
-
+		x += xstep;
+		y += ystep;
 	}
-    win->ray[i].wall_hit_xt = xintercept;
-    win->ray[i].wall_hit_yt = yintercept;
-    return (sqrt(pow(win->map->player->x - xintercept, 2) + pow(win->map->player->y - yintercept, 2)));
+	return (ft_sqrt(win, x, y, i));
 }
 
 
@@ -626,8 +248,7 @@ double vertget_the_distance(t_mlx *win, double ray_angle , int i)
 	double	xintercept;
 	double	yintercept;
 
-	xintercept = floor(win->map->player->x / 64)
-		* 64;
+	xintercept = floor(win->map->player->x / 64) * 64;
 	if (ray_angle > 3 * M_PI / 2 || ray_angle < M_PI / 2)
 		xintercept += 64;
 	yintercept = win->map->player->y + ((xintercept - win->map->player->x)

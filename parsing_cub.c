@@ -6,7 +6,7 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:26:00 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/11 17:37:30 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 20:39:31 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,4 +53,26 @@ int	is_digit(char c)
 	if (c >= '0' && c <= '9')
 		return (1);
 	return (0);
+}
+
+int	open_texture(t_map *map)
+{
+	int	no;
+	int	so;
+	int	we;
+	int	ea;
+
+	no = open(map->no, O_RDONLY);
+	if (no == -1)
+		return (1);
+	so = open(map->so, O_RDONLY);
+	if (so == -1)
+		return (close(no), 1);
+	we = open(map->we, O_RDONLY);
+	if (we == -1)
+		return (close(no), close(so), 1);
+	ea = open(map->ea, O_RDONLY);
+	if (ea == -1)
+		return (close(no), close(so), close(we), 1);
+	return (close(no), close(so), close(we), close(ea), 0);
 }
