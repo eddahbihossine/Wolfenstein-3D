@@ -6,7 +6,7 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/10 17:40:53 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 19:31:57 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,5 +117,38 @@ int size_line(char *line);
 char	*ft_strtrim(char const *s1, char const *set);
 int	ft_strncmp(const char *s1, const char *s2, size_t n);
 
-
+// parsing
+int	check_file(char *file);
+int is_space(char c);
+char  *skip_space(char *line);
+int is_digit(char c);
+int	init_floor(t_map *map, char *ptr);
+int	parsing_coma(char *line);
+int	valid_range(int r, int g, int b);
+int	init_ceiling(t_map *map, char *line);
+int	size_line(char *line);
+int	get_height(t_map *map);
+int	get_width(char *line);
+void	init_map(t_map *map, int size);
+int	count_lines(char *str);
+int	parsing_floor_ceiling(char **line);
+int	is_empty(char *line);
+char	*my_strdup(char *line);
+int	get_floor(char *line, int *k, t_map *map);
+int	get_east_texture(char *line, int *k, t_map *map);
+int	get_west_texture(char *line, int *k, t_map *map);
+int	get_south_texture(char *line, int *k, t_map *map);
+int	get_north_texture(char *line, int *k, t_map *map);
+int	check_empty_line(char *line, t_map *map);
+void	all_texture(t_map *map, char *line, int *k);
+int	get_ceiling(char *line, int *k, t_map *map);
+void	get_map(t_map *map, int *k, int *i, char *line);
+int	init_all(t_map *map, int fd, char *str);
+char	*next_line(int *cout, char *line, int fd);
+void	ft_free_map(t_map **map);
+void	free_empty_line(t_map *map, int *i);
+int	get_longest_line(t_map *map);
+int	check_valid_map(t_map *map);
+int	valid_position(t_map *map);
+int	check_player_position(t_map *map);
 #endif

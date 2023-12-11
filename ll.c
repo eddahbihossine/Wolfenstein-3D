@@ -59,30 +59,6 @@ int parsing_coma(char *line)
     return (0);
 }
 
-int parsing_floor_ceiling(char **line)
-{
-    int i;
-    int j ;
-    char *p;
-
-    i = 0;
-    while (line[i] != NULL)
-    {
-        j = 0;
-        p = ft_strtrim(line[i], "' ' '\t' '\n' '\v' '\f' '\r'");
-        while(p[j] != '\0')
-        {
-            if(!is_digit(p[j]))
-                return (free(p), 1);
-            j++;
-        }
-        free(p);
-        i++;
-    }
-    if(i != 3)
-        return (1);
-    return (0);
-}
 
 int valid_range(int r, int g, int b)
 {
