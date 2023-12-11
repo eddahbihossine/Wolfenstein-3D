@@ -61,17 +61,22 @@ int parsing_coma(char *line)
 
 int parsing_floor_ceiling(char **line)
 {
-    int i = 0;
+    int i;
     int j ;
+    char *p;
+
+    i = 0;
     while (line[i] != NULL)
     {
         j = 0;
-        while(line[i][j] != '\0')
+        p = ft_strtrim(line[i], "' ' '\t' '\n' '\v' '\f' '\r'");
+        while(p[j] != '\0')
         {
-            if(!is_digit(line[i][j]))
-                return (1);
+            if(!is_digit(p[j]))
+                return (free(p), 1);
             j++;
         }
+        free(p);
         i++;
     }
     if(i != 3)
@@ -100,6 +105,7 @@ int init_floor(t_map *map, char *ptr)
         return (free(tmp), 1);
     
     split = ft_split(tmp, ',');
+  
     if(parsing_floor_ceiling(split))
     {
         ft_free(split);
@@ -319,10 +325,10 @@ void all_texture(t_map *map, char *line, int *k)
         get_west_texture(line, k, map);
     else if(line[0]== 'E' && line[1] == 'A' && !map->ea)
         get_east_texture(line, k, map);
-    else if(line[0]== 'C' && map->ceiling.r == -42)
-        get_ceiling(line, k, map);
     else if(line[0]== 'F' && map->floor.r == -42)
         get_floor(line, k, map);
+    else if(line[0]== 'C' && map->ceiling.r == -42)
+        get_ceiling(line, k, map);
     free(line);
 }
 
@@ -361,7 +367,10 @@ int init_all(t_map *map , int fd, char *str)
     map->map[i] = NULL;
     close(fd);
     if(k != 6)
+    {
+        printf("%d\n", k);
         return (1);
+    }
     return (0);
 }
 
@@ -689,21 +698,28 @@ int get_player_position(t_map *map)
     }
     return (1);
 }
+
 int open_texture(t_map *map)
 {
     int no;
     int so;
     int we;
     int ea;
+
     no = open(map->no, O_RDONLY);
+    if(no == -1)
+        return (1);
     so = open(map->so, O_RDONLY);
+    if(so == -1)
+        return (1);
     we = open(map->we, O_RDONLY);
+    if(we == -1)
+        return (1);
     ea = open(map->ea, O_RDONLY);
-    if(no == -1 || so == -1 || we == -1 || ea == -1)
+    if(ea == -1)
         return (1);
     return (close(no), close(so), close(we), close(ea), 0);
 }
-
 int parsing_map(t_map *map , int fd, char *str)
 {
     if(init_all(map, fd, str) || check_player_position(map))
@@ -1310,9 +1326,9 @@ int main(int ac, char **av)
     mlx_image_to_window(window->mlx, window->img, 0, 0);
     mlx_image_to_window(window->mlx, window->img1, 0, 0);
     mlx_loop_hook(window->mlx, hook_stuff, window);
-    // render_3d(window);
+    render_3d(window);
     // draw2d(window);
-    // adraw(window);
+    adraw(window);
     mlx_loop(window->mlx);
     ft_free_window(&window);
     close(fd);
