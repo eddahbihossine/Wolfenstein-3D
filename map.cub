@@ -1,13 +1,13 @@
 NO ./textures/1.png
 SO ./textures/2.png
-WE ./textures/1.png
+WE ./textures/4.png
 EA ./textures/3.png
 F 255,255,255
 C 0,0,0
 
-1111111
+111111
 100N001
 1000101
-1000001
+1001001
 1111111
 

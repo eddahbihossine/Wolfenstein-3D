@@ -763,12 +763,20 @@ int check_wall_collision(t_mlx *win, double xx, double yy)
 
     x = floor(xx / 64);
     y = floor(yy / 64);
+        if(win->ray[0].ray_distance< 12 && win->ray[799].ray_distance  < 12)
+        {
+            if(win->ray[0].ray_distance < win->ray[799 /2].ray_distance &&  win->ray[799].ray_distance < win->ray[799 /2].ray_distance )
+                return(6);
+        }
+    
     if (x < 0 || y < 0 || x > win->map->map_width || y > win->map->map_height)
         return (1);
     return (win->map->map[y][x] == '1');
 }
 void MoveForward(t_mlx *mlx, double speed)
 {
+     if(check_wall_collision(mlx,mlx->map->player->x + cos(mlx->map->player->angle) * speed,mlx->map->player->y+ cos(mlx->map->player->angle) * speed) == 6 )
+        return ;
     if(check_wall_collision(mlx, mlx->map->player->x, mlx->map->player->y)
     || check_wall_collision(mlx, mlx->map->player->x + cos(mlx->map->player->angle) * speed, mlx->map->player->y + sin(mlx->map->player->angle) * speed))
         return ;
@@ -778,6 +786,9 @@ void MoveForward(t_mlx *mlx, double speed)
 
 void MoveBackward(t_mlx *mlx, double speed)
 {
+   
+   if(check_wall_collision(mlx,mlx->map->player->x + cos(mlx->map->player->angle) * speed,mlx->map->player->y+ cos(mlx->map->player->angle) * speed) == 6 )
+        return ;
     if(check_wall_collision(mlx, mlx->map->player->x, mlx->map->player->y)|| check_wall_collision(mlx, mlx->map->player->x - cos(mlx->map->player->angle) * speed, mlx->map->player->y - sin(mlx->map->player->angle) * speed))
         return ;
     mlx->map->player->x -= cos(mlx->map->player->angle) * speed;
@@ -786,6 +797,8 @@ void MoveBackward(t_mlx *mlx, double speed)
 
 void MoveLeft(t_mlx *mlx, double speed)
 {
+     if(check_wall_collision(mlx,mlx->map->player->x + cos(mlx->map->player->angle) * speed,mlx->map->player->y+ cos(mlx->map->player->angle) * speed) == 6 )
+        return ;
     if(check_wall_collision(mlx, mlx->map->player->x, mlx->map->player->y) || check_wall_collision(mlx, mlx->map->player->x + cos(mlx->map->player->angle - M_PI_2) * speed, mlx->map->player->y + sin(mlx->map->player->angle - M_PI_2) * speed))
         return ;
     mlx->map->player->x += cos(mlx->map->player->angle - M_PI_2) * speed;
@@ -794,10 +807,24 @@ void MoveLeft(t_mlx *mlx, double speed)
 
 void MoveRight(t_mlx *mlx, double speed)
 {
+     if(check_wall_collision(mlx,mlx->map->player->x + cos(mlx->map->player->angle) * speed,mlx->map->player->y+ cos(mlx->map->player->angle) * speed) == 6 )
+        return ;
     if(check_wall_collision(mlx, mlx->map->player->x, mlx->map->player->y) || check_wall_collision(mlx, mlx->map->player->x + cos(mlx->map->player->angle + M_PI_2) * speed, mlx->map->player->y + sin(mlx->map->player->angle + M_PI_2) * speed))
         return ;
     mlx->map->player->x += cos(mlx->map->player->angle + M_PI_2) * speed;
     mlx->map->player->y += sin(mlx->map->player->angle + M_PI_2) * speed;
+}
+
+void print_values(t_mlx *mlx)
+{
+    int i =0;
+    while(i < 800)
+    {
+        printf("%f\n",mlx->ray[i].ray_distance);
+        // getchar();
+
+    }
+
 }
 void render_3d(t_mlx *win);
 void adraw(t_mlx *win);
@@ -810,7 +837,6 @@ void hook_stuff(void *params)
         mlx_delete_image(win->mlx, win->img);
         mlx_delete_image(win->mlx, win->img1);
 
-        raycast(win);
         if (mlx_is_key_down(win->mlx, ESC))
             exit(0);
         if (mlx_is_key_down(win->mlx, W))
@@ -831,38 +857,13 @@ void hook_stuff(void *params)
             win->map->player->angle -= 0.04;
         win->img = mlx_new_image(win->mlx, WIDTH, HEIGHT);
         win->img1 = mlx_new_image(win->mlx, WIDTH, HEIGHT);
+        raycast(win);
+        // print_values(win);
         render_3d(win);
-         adraw(win);
+        adraw(win);
 }
 
 
-void mlx_draw_rect(t_mlx *win, int x, int y, int color)
-{
-    int i = 0;
-    int j = 0;
-    while (i < 10)
-    {
-        j = 0;
-        while (j < 10)
-        {
-           mlx_put_pixel(win->img, x + j, y + i, color);
-            j++;
-        }
-        i++;
-    }
-}
-void rsmatlplayer(t_mlx *win)
-{
-    for (int i = 0; i < win->map->map_height; i++)
-    {
-        for (int j = 0; j < win->map->map_width; j++)
-        {
-            if(win->map->map[i][j] =='W')
-                mlx_draw_rect(win, j * 64, i * 64, 0x00FFFFFFFf);
-        }
-   
-    }
-}
 // void draw2d(t_mlx *win)
 // {
 //     rsmatlplayer(win);
@@ -1119,16 +1120,6 @@ double compare_distance(double a , double b, t_mlx *win ,int i)
     
 }
 
-void    texture_thewall(t_mlx *win, mlx_texture_t *texture)
-{
-    (void)win;
-    (void)texture;
-    // printf("texture north : %s\n", win->map->no);
-    // printf("texture south : %s\n", win->map->so);
-
-    // printf("texture west : %s\n", win->map->we);
-
-}
 uint8_t *  convert_to_rgb(uint8_t *pixels)
 {
     int i = 0;
@@ -1190,31 +1181,28 @@ void render_3d(t_mlx *win)
 	i = -1;
 	while (++i < 800)
 	{
-    int texture_index = check_whichtexture(win, i);
-    win->texture = ptr[texture_index];
-	correct_distance = win->ray[i].ray_distance * cos(win->map->player->angle - win->ray[i].ray_angle);
-    double wall_strip_heightt = projection_distance * 64 / correct_distance;
-	int	y;
-	int	y1;
-	y1 = (HEIGHT / 2) - (wall_strip_heightt / 2);
-	y = -1;
-    size_t floor = get_color( win->map->floor.r, win->map->floor.g, win->map->floor.b , 255);
-    size_t ceiling = get_color( win->map->ceiling.r, win->map->ceiling.g, win->map->ceiling.b, 255);
-
-        s = malloc(sizeof(int *) * 64 );
-        int w = 0;
-        for(int j = 0; j < 64; j++)
-        {
-            s[j] = malloc(sizeof(int) * 64 );
-            
-            for(int k = 0; k < 64; k++)
+        int texture_index = check_whichtexture(win, i);
+        win->texture = ptr[texture_index];
+        correct_distance = win->ray[i].ray_distance * cos(win->map->player->angle - win->ray[i].ray_angle);
+        double wall_strip_heightt = projection_distance * 64 / correct_distance;
+        int	y;
+        int	y1;
+        y1 = (HEIGHT / 2) - (wall_strip_heightt / 2);
+        y = -1;
+        size_t floor = get_color( win->map->floor.r, win->map->floor.g, win->map->floor.b , 255);
+        size_t ceiling = get_color( win->map->ceiling.r, win->map->ceiling.g, win->map->ceiling.b, 255);
+            s = malloc(sizeof(int *) * 64 );
+            int w = 0;
+            for(int j = 0; j < 64; j++)
             {
-                s[j][k] = get_color(win->texture->pixels[w], win->texture->pixels[w + 1], win->texture->pixels[w + 2], win->texture->pixels[w + 3]);
-                w += 4;
+                s[j] = malloc(sizeof(int) * 64 );
+                
+                for(int k = 0; k < 64; k++)
+                {
+                    s[j][k] = get_color(win->texture->pixels[w], win->texture->pixels[w + 1], win->texture->pixels[w + 2], win->texture->pixels[w + 3]);
+                    w += 4;
+                }
             }
-        }
-
-
 	while (++y < HEIGHT)
 	{
 		if (y < y1)
@@ -1283,7 +1271,6 @@ void raycast(t_mlx *win)
         ray_angle += ray_step;
         i++;
     }
- 
 }
 
 
@@ -1319,7 +1306,6 @@ int main(int ac, char **av)
     window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
     window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
     window->img1 = mlx_new_image(window->mlx, 22,22);
-   
     init_params(window);
     mlx_image_to_window(window->mlx, window->img, 0, 0);
     mlx_image_to_window(window->mlx, window->img1, 0, 0);
