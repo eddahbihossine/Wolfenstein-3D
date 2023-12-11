@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3D.h"
+#include "./includes/cub3D.h"
 
 int	check_wall(t_map *map)
 {

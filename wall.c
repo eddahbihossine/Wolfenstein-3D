@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3D.h"
+#include "./includes/cub3D.h"
 
 int	valid_wall_help(t_map *map, int i, int j)
 {

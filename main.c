@@ -1,17 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include "cub3D.h"
 
-
-
-
-
+#include "./includes/cub3D.h"
 
 void	render_3d(t_mlx *win);
 void	adraw(t_mlx *win);
-int	has_wall(t_mlx *win, double x, double y);
+int		has_wall(t_mlx *win, double x, double y);
 
 
 void f()
@@ -19,8 +11,7 @@ void f()
     system("leaks cub3D");
 }
 
-
-void raycast(t_mlx *win);
+void	raycast(t_mlx *win);
 
 void	ft_free_window(t_mlx **window)
 {
@@ -36,8 +27,6 @@ void	re_draw(t_mlx *win)
 	render_3d(win);
 	adraw(win);
 }
-
-
 
 int	mlx_draw(t_mlx *win, int x, int y, int color)
 {
@@ -76,6 +65,7 @@ void	draw_minimap(t_mlx *win)
 	win->map_2d.x++;
 	win->map_2d.xmin++;
 }
+
 void	adraw(t_mlx *win)
 {
 	win->map_2d.y = (int)win->map->player->y - 100;
@@ -103,7 +93,6 @@ void	adraw(t_mlx *win)
 	}
 	mlx_image_to_window(win->mlx, win->img, 0, 0);
 }
-
 
 int	check_whichside(t_mlx *win)
 {
@@ -205,76 +194,7 @@ int	has_wall(t_mlx *win, double x, double y)
 	return (win->map->map[i][j] == '1');
 }
 
-double	ft_sqrt(t_mlx *win ,int x , int y, int i)
-{
-	win->ray[i].wall_hit_xt = x;
-	win->ray[i].wall_hit_yt = y;
-	return (sqrt(pow(win->map->player->x - x, 2)
-			+ pow(win->map->player->y - y, 2)));
-}
-double	horizget_the_distance(t_mlx *win, double ray_angle, int i)
-{
-	double	x;
-	double	y;
-	double	xstep;
-	double	ystep;
 
-	y = floor(win->map->player->y / 64) * 64;
-	if (ray_angle > 0 && ray_angle < M_PI)
-		y += 64;
-	x = win->map->player->x + ((y - win->map->player->y) / tan(ray_angle));
-	ystep = 64;
-	if (ray_angle > M_PI)
-		ystep *= -1;
-	xstep = 64 / tan(ray_angle);
-	if (ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2 && xstep > 0)
-		xstep *= -1;
-	if ((ray_angle < M_PI / 2 || ray_angle > 3 * M_PI / 2) && xstep < 0)
-		xstep *= -1;
-	if (ray_angle > M_PI)
-		y -= 0.1;
-	while (!has_wall(win, x, y))
-	{
-		x += xstep;
-		y += ystep;
-	}
-	return (ft_sqrt(win, x, y, i));
-}
-
-
-
-double vertget_the_distance(t_mlx *win, double ray_angle , int i)
-{
-	double	xintercept;
-	double	yintercept;
-
-	xintercept = floor(win->map->player->x / 64) * 64;
-	if (ray_angle > 3 * M_PI / 2 || ray_angle < M_PI / 2)
-		xintercept += 64;
-	yintercept = win->map->player->y + ((xintercept - win->map->player->x)
-			* tan(ray_angle));
-	double	xstep;
-	double	ystep;
-	xstep = 64;
-	if (ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2)
-		xstep *= -1;
-	ystep = 64 * tan(ray_angle);
-	if (ray_angle > M_PI && ystep > 0)
-	    ystep *= -1;
-	if (ray_angle < M_PI && ystep < 0)
-		ystep *= -1;
-	if (ray_angle > M_PI / 2 && ray_angle < 3 * M_PI / 2)
-		xintercept -= 0.1;
-	while (!has_wall(win, xintercept, yintercept))
-	{
-
-		xintercept += xstep;
-		yintercept += ystep;
-	}
-    win->ray[i].wall_hit_x = xintercept;
-    win->ray[i].wall_hit_y = yintercept;
-    return (sqrt(pow(win->map->player->x - xintercept, 2) + pow(win->map->player->y - yintercept, 2)));
-}
 
 
 
@@ -382,17 +302,13 @@ void render_3d(t_mlx *win)
             int x;
             int l;
             if(win->ray[i].was_hit_vertical)
-            {
                 x = fmod(win->ray[i].wall_hit_y, 64);
-            }
+        
             else
-            {
                 x = fmod(win->ray[i].wall_hit_xt, 64);
-            }
             l = 64 * (y - y1) / wall_strip_heightt;
             mlx_put_pixel(win->img, i, y, s[l][x]);
         }
-    
 		else
 			mlx_put_pixel(win->img, i, y, (u_int32_t)floor);
 	}
@@ -473,7 +389,7 @@ int main(int ac, char **av)
         ft_free_window(&window);
         return (1);
     }
-    window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
+    window->mlx = mlx_init(WIDTH, HEIGHT, "./includes/cub3D",false);
     window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
     window->img1 = mlx_new_image(window->mlx, 22,22);
     init_params(window);

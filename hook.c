@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3D.h"
+#include "./includes/cub3D.h"
 
 double	radians_to_degrees(double radians)
 {

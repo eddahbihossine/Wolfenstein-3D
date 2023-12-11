@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3D.h"
+#include "./includes/cub3D.h"
 
 static int	ft_len(char const *s, char c)
 {

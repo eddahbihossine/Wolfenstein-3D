@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   free_map.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
+/*   By: heddahbi <heddahbi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 19:13:49 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/11 19:25:02 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 23:38:54 by heddahbi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3D.h"
+#include "./includes/cub3D.h"
 
 char	*next_line(int *cout, char *line, int fd)
 {

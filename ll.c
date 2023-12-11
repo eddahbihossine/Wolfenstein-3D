@@ -1030,7 +1030,7 @@ int main(int ac, char **av)
     }
     init_params(&window);
 
-   window.mlx = mlx_init(WIDTH, HEIGHT, "cub3D",false);
+   window.mlx = mlx_init(WIDTH, HEIGHT, "./includes/cub3D",false);
    window.img = mlx_new_image(window.mlx, WIDTH, HEIGHT);
    printf("%d\n", window.map->map_height);
     printf("%d\n", window.map->map_width);
