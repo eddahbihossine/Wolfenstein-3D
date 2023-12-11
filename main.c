@@ -695,11 +695,18 @@ int open_texture(t_map *map)
     int so;
     int we;
     int ea;
+    
     no = open(map->no, O_RDONLY);
+    if(no == -1)
+        return (1);
     so = open(map->so, O_RDONLY);
+    if(so == -1)
+        return (1);
     we = open(map->we, O_RDONLY);
+    if(we == -1)
+        return (1);
     ea = open(map->ea, O_RDONLY);
-    if(no == -1 || so == -1 || we == -1 || ea == -1)
+    if(ea == -1)
         return (1);
     return (close(no), close(so), close(we), close(ea), 0);
 }
