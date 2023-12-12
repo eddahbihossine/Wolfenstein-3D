@@ -6,7 +6,7 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 21:48:05 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/11 23:57:05 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/12 03:55:04 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,5 +65,6 @@ void	hook_stuff(void *params)
 		win->map->player->angle += 0.04;
 	else if (mlx_is_mouse_down(win->mlx, 1))
 		win->map->player->angle -= 0.04;
+	
 	re_draw(win);
 }

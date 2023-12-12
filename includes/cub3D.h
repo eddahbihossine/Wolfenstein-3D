@@ -6,7 +6,7 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/12 01:46:23 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/12 03:51:48 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ typedef struct s_mlx
     t_map *map;
     t_ray ray[WIDTH];
     mlx_texture_t *texture;
-    mlx_texture_t **ptr;
+    mlx_texture_t *ptr[4];
     t_map_2d map_2d;
     double	correct_distance;
 	double	projection_distance;
