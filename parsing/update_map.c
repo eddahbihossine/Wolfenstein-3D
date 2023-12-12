@@ -6,11 +6,11 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 19:36:31 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/11 19:50:17 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 23:54:11 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./includes/cub3D.h"
+#include "../includes/cub3D.h"
 
 int	check_wall(t_map *map)
 {

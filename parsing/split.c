@@ -6,11 +6,11 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 06:30:27 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/11/15 18:25:28 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 23:54:05 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./includes/cub3D.h"
+#include "../includes/cub3D.h"
 
 static int	ft_len(char const *s, char c)
 {

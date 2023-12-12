@@ -6,11 +6,11 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/10 23:53:09 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/11/14 13:07:11 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 23:53:28 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./includes/cub3D.h"
+#include "../includes/cub3D.h"
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {

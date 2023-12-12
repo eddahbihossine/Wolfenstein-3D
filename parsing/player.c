@@ -6,11 +6,11 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 19:18:08 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/11 20:36:14 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 23:54:01 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./includes/cub3D.h"
+#include "../includes/cub3D.h"
 
 int	check_player_position(t_map *map)
 {

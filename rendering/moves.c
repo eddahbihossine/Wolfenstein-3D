@@ -6,11 +6,11 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 21:39:56 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/11 21:47:25 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 23:57:14 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./includes/cub3D.h"
+#include "../includes/cub3D.h"
 
 void	moveforward(t_mlx *mlx, double speed)
 {

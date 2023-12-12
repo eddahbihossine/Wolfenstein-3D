@@ -6,11 +6,11 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 17:51:35 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/11 18:00:29 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 23:53:51 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./includes/cub3D.h"
+#include "../includes/cub3D.h"
 
 int	count_lines(char *str)
 {

@@ -6,11 +6,11 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/09 22:41:30 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/11 18:38:58 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 23:53:48 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./includes/cub3D.h"
+#include "../includes/cub3D.h"
 
 char	*ft_get_line(char **str, char **line, int new_line)
 {

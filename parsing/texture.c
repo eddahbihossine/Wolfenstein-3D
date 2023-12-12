@@ -6,11 +6,11 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 18:06:40 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/11 18:16:03 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 23:54:08 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./includes/cub3D.h"
+#include "../includes/cub3D.h"
 
 int	get_north_texture(char *line, int *k, t_map *map)
 {

@@ -6,11 +6,11 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 18:19:58 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/11 19:14:00 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 23:53:53 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./includes/cub3D.h"
+#include "../includes/cub3D.h"
 
 void	get_map(t_map *map, int *k, int *i, char *line)
 {

@@ -6,7 +6,7 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 03:26:59 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/11 21:51:16 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/12 01:46:23 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,9 +109,17 @@ typedef struct s_mlx
     t_map *map;
     t_ray ray[WIDTH];
     mlx_texture_t *texture;
+    mlx_texture_t **ptr;
     t_map_2d map_2d;
+    double	correct_distance;
+	double	projection_distance;
+	int		texture_index;
+	int		i;
+	double wall_strip_heightt;
+	int		y;
+	int		y1;
+	int		s[64][64];
 
-    
 } t_mlx;
 
 char	*get_next_line(int fd);
@@ -128,8 +136,6 @@ void	ft_free(char **s);
 int size_line(char *line);
 char	*ft_strtrim(char const *s1, char const *set);
 int	ft_strncmp(const char *s1, const char *s2, size_t n);
-
-// parsing
 int	check_file(char *file);
 int is_space(char c);
 char  *skip_space(char *line);
@@ -190,4 +196,22 @@ double	radians_to_degrees(double radians);
 double	degrees_to_radians(double degrees);
 int	check_wall_collision(t_mlx *win, double xx, double yy);
 void	re_draw(t_mlx *win);
+void	render_3d(t_mlx *win);
+void	raycast(t_mlx *win);
+void	adraw(t_mlx *win);
+int		has_wall(t_mlx *win, double x, double y);
+int	check_whichside(t_mlx *win);
+void	set_the_vision_angle(t_mlx *win, int side);
+void	init_params(t_mlx *win);
+int	check_intersection(t_mlx *win, int x, int y);
+int	check_upordown(double ray_angle);
+int	check_leftorrigh( double ray_angle);
+int	has_wall(t_mlx *win, double x, double y);
+double	compare_distance(double a , double b, t_mlx *win ,int i);
+size_t get_color(int r, int g, int b, int a);
+size_t texture_color(t_mlx *win, int w);
+size_t floor_color(t_mlx *win);
+size_t ceiling_color(t_mlx *win);
+int check_whichtexture(t_mlx *win,int i) ;
+void init_texture(t_mlx *win);
 #endif

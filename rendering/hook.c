@@ -6,11 +6,11 @@
 /*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/11 21:48:05 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/11 21:51:47 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/11 23:57:05 by abel-hid         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./includes/cub3D.h"
+#include "../includes/cub3D.h"
 
 double	radians_to_degrees(double radians)
 {
