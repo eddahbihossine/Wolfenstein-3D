@@ -68,4 +68,5 @@ int main(int ac, char **av)
     free(window->map->player);
     close(fd);
     return 0;
-} 
+}
+

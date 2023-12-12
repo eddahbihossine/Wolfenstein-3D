@@ -1,8 +1,8 @@
 NO ./textures/1.png
-SO ./textures/2.png
-WE ./textures/4.png
-EA ./textures/4.png
-F 255  ,  255  ,   255
+SO ./textures/1.png
+WE ./textures/2.png
+EA ./textures/2.png
+F 200  ,  50  ,   100
 C 0,0,0
 
 
