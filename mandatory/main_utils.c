@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
+/*   By: heddahbi <heddahbi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 22:22:38 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/12 22:40:58 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/13 21:42:15 by heddahbi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	_close_win(void *param)
 
 void	mlx(t_mlx *window)
 {
-	window->mlx = mlx_init(WIDTH, HEIGHT, "./includes/cub3D", false);
+	window->mlx = mlx_init(WIDTH, HEIGHT, "cub3D", false);
 	window->img = mlx_new_image(window->mlx, WIDTH, HEIGHT);
 	init_params(window);
 	mlx_image_to_window(window->mlx, window->img, 0, 0);

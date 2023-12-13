@@ -3,25 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abel-hid <abel-hid@student.42.fr>          +#+  +:+       +#+        */
+/*   By: heddahbi <heddahbi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 22:15:29 by abel-hid          #+#    #+#             */
-/*   Updated: 2023/12/12 23:39:30 by abel-hid         ###   ########.fr       */
+/*   Updated: 2023/12/13 21:41:21 by heddahbi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./includes/cub3D.h"
 
-void    f()
-{
-    system("leaks cub3D");
-}
-
 int	main(int ac, char **av)
 {
 	int		fd;
 	t_mlx	*window;
-	atexit(f);
 
 	if (check_map(ac, av))
 		return (1);
