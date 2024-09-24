@@ -2,7 +2,7 @@ Here's an updated version of the README with more energy, photos, and emojis:
 
 ---
 
-# 🚀 Cub3D 🚀
+# 🚀 WolfENstien Mi Na3ima  🚀
 
 ## Overview
 
