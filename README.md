@@ -1,6 +1,3 @@
-Here's an updated version of the README with more energy, photos, and emojis:
-
----
 
 # 🚀 WolfENstien Mi Na3ima  🚀
 
